@@ -8,8 +8,8 @@
   --border: #dce5e2;
   --border-strong: #c7d4d0;
   --text: #13231f;
-  --text-muted: #60736d;
-  --text-soft: #8a9b95;
+  --text-muted: #536660;
+  --text-soft: #63766f;
   --accent: #219b86;
   --accent-strong: #167a69;
   --accent-soft: rgba(33, 155, 134, 0.11);
@@ -128,7 +128,7 @@ body {
   --accent-soft: rgba(33, 155, 134, 0.11);
   --accent-border: rgba(33, 155, 134, 0.34);
   --accent-focus: rgba(33, 155, 134, 0.24);
-  --data: #3f7f73;
+  --data: #326f64;
   --data-soft: rgba(63, 127, 115, 0.1);
   --data-border: rgba(63, 127, 115, 0.28);
   --section-glow: rgba(33, 155, 134, 0.085);

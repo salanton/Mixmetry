@@ -25,7 +25,8 @@ const InstallHint = () => {
   return (
     <div className="install-hint" role="note">
       <div>
-        Добавьте на экран «Домой» в Safari → Поделиться → «На экран «Домой» для работы офлайн.
+        Добавьте приложение на экран «Домой»: в Safari нажмите «Поделиться» → «На экран „Домой“».
+        После этого оно будет доступно офлайн.
       </div>
       <button type="button" className="text-btn" onClick={handleClose} aria-label="Закрыть">
         Закрыть

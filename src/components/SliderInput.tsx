@@ -24,11 +24,14 @@ const SliderInput = ({
   displayValue,
   disabled = false,
   onChange,
-}: Props) => (
+}: Props) => {
+  const inputId = useId()
+
+  return (
   <div className={`slider${disabled ? ' slider--disabled' : ''}`}>
     {showHeader ? (
       <div className="slider__row">
-        {label ? <label className="input-label">{label}</label> : <span aria-hidden="true" />}
+        {label ? <label className="input-label" htmlFor={inputId}>{label}</label> : <span aria-hidden="true" />}
         <div className="slider__value">
           {value.toFixed(step < 1 ? 1 : 0)}
           {suffix ? ` ${suffix}` : ''}
@@ -41,7 +44,9 @@ const SliderInput = ({
       </div>
     )}
     <input
+      id={inputId}
       type="range"
+      aria-label={label ?? helper}
       min={min}
       max={max}
       step={step}
@@ -51,6 +56,8 @@ const SliderInput = ({
     />
     {helper ? <p className="input-helper slider__helper">{helper}</p> : null}
   </div>
-)
+  )
+}
 
 export default SliderInput
+import { useId } from 'react'

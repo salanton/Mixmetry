@@ -271,7 +271,7 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
   }
 
   const handleCreateReminder = () => {
-    const reminderTitle = `Наполнить бак (${params.tankVolumeLiters}л)`
+    const reminderTitle = `Наполнить бак (${params.tankVolumeLiters} л)`
     const reminderDescription = 'Следующее наполнение бака автополива'
     downloadCalendarFile(reminderTitle, nextRefillDate, reminderDescription)
   }

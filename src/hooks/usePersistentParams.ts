@@ -54,7 +54,7 @@ const isRecipeGrowMethodId = (value: unknown): value is GrowMethodId =>
 const isRecipePlantStageId = (value: unknown): value is PlantStageId =>
   RECIPE_PLANT_STAGES.includes(value as PlantStageId)
 
-const sanitize = (payload: Partial<Params>): Params => ({
+export const sanitizeParams = (payload: Partial<Params>): Params => ({
   lightHours: clamp(
     payload.lightHours ?? DEFAULT_PARAMS.lightHours,
     PARAM_LIMITS.lightHours.min,
@@ -119,9 +119,9 @@ const sanitize = (payload: Partial<Params>): Params => ({
 const reducer = (state: Params, action: Action): Params => {
   switch (action.type) {
     case 'hydrate':
-      return sanitize(action.payload)
+      return sanitizeParams(action.payload)
     case 'set':
-      return sanitize({ ...state, [action.key]: action.value })
+      return sanitizeParams({ ...state, [action.key]: action.value })
     default:
       return state
   }
@@ -136,7 +136,7 @@ export const usePersistentParams = () => {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<Params>
-        dispatch({ type: 'hydrate', payload: sanitize(parsed) })
+        dispatch({ type: 'hydrate', payload: sanitizeParams(parsed) })
       }
     } catch {
       dispatch({ type: 'hydrate', payload: DEFAULT_PARAMS })

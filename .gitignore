@@ -3,3 +3,5 @@ dist/
 .DS_Store
 .git.broken-pointer
 *.local
+playwright-report/
+test-results/
