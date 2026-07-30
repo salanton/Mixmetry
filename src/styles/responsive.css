@@ -4,11 +4,6 @@
     padding-right: 1rem;
   }
 
-  .topbar {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
   .page-tabs {
     flex-basis: auto;
     width: 100%;

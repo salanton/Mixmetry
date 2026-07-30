@@ -1,3 +1,82 @@
+.topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0 1rem;
+  z-index: 10;
+}
+
+.topbar__heading {
+  min-width: 0;
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+}
+
+.topbar__mark {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+
+  .topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+.topbar__title {
+  color: var(--text);
+  font-weight: 820;
+  letter-spacing: -0.035em;
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex: 0 1 520px;
+}
+
+.topbar__actions .page-tabs {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 639px) {
+  .topbar {
+    position: absolute;
+    top: calc(0.75rem + env(safe-area-inset-top));
+    right: max(0.8rem, env(safe-area-inset-right));
+    left: max(0.8rem, env(safe-area-inset-left));
+    min-height: 56px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .topbar__heading,
+  .topbar .settings-trigger {
+    opacity: var(--mobile-header-opacity, 1);
+    transform: translate3d(0, var(--mobile-header-offset, 0), 0);
+    will-change: transform, opacity;
+  }
+
+  .topbar__heading {
+    flex: 1 1 auto;
+  }
+
+  .topbar__actions {
+    display: contents;
+  }
+}
+
+/* Header refinements remain last within this consolidated layer. */
 /* The header shares the page canvas instead of forming a separate color band. */
 :root[data-theme="dark"] .page-tabs__button--calculator.page-tabs__button--active {
   color: #76bde0;

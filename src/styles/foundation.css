@@ -94,10 +94,6 @@
   --section-glow: rgba(117, 106, 172, 0.085);
 }
 
-.topbar {
-  padding-block: var(--space-3) var(--space-4);
-}
-
 .mobile-nav-dock {
   display: none;
 }
@@ -168,16 +164,6 @@
   padding: calc(1.25rem + env(safe-area-inset-top)) 1.25rem 1.5rem;
 }
 
-.topbar {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.75rem 0 1rem;
-  z-index: 10;
-}
-
 .back-to-top {
   position: fixed;
   top: calc(0.75rem + env(safe-area-inset-top));
@@ -244,19 +230,6 @@
   flex: 0 0 calc((100% - (var(--swipe-page-gap) * 2)) / 3);
   height: max-content;
   min-width: 0;
-}
-
-.topbar__heading {
-  min-width: 0;
-}
-
-.topbar__brand {
-  display: flex;
-  align-items: center;
-}
-
-.topbar__mark {
-  flex: 0 0 auto;
 }
 
 .page-tabs {

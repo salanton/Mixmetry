@@ -211,25 +211,6 @@
     padding-block: 0;
   }
 
-  .topbar {
-    position: absolute;
-    top: calc(0.75rem + env(safe-area-inset-top));
-    right: max(0.8rem, env(safe-area-inset-right));
-    left: max(0.8rem, env(safe-area-inset-left));
-    min-height: 56px;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-  }
-
-  .topbar__heading,
-  .topbar .settings-trigger {
-    opacity: var(--mobile-header-opacity, 1);
-    transform: translate3d(0, var(--mobile-header-offset, 0), 0);
-    will-change: transform, opacity;
-  }
-
   .recipe-page > .controls-grid .control-card::before {
     content: none;
   }
@@ -262,14 +243,6 @@
 
   .swipe-panel::-webkit-scrollbar {
     display: none;
-  }
-
-  .topbar__heading {
-    flex: 1 1 auto;
-  }
-
-  .topbar__actions {
-    display: contents;
   }
 
   .page-tabs--desktop {
