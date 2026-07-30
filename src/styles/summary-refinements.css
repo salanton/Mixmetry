@@ -1,0 +1,74 @@
+/* Fertilizer summary is a single-purpose counter strip. */
+.fertilizer-overview {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-height: 72px;
+  padding: 0.55rem 1rem;
+}
+
+.fertilizer-overview__tile,
+.fertilizer-overview__tile--base {
+  min-height: 48px;
+  padding: 0.2rem 1rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.fertilizer-overview__tile--base {
+  align-items: initial;
+}
+
+.fertilizer-overview__tile strong,
+.fertilizer-overview__tile--base strong {
+  color: var(--data);
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Roboto Mono', monospace;
+  font-size: 1.12rem;
+}
+
+@media (max-width: 639px) {
+  .fertilizer-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0.55rem 0.4rem;
+  }
+
+  .fertilizer-overview__tile,
+  .fertilizer-overview__tile--base {
+    grid-column: auto;
+    min-height: 48px;
+    padding: 0.2rem 0.35rem;
+    border-bottom: 0;
+  }
+
+  .fertilizer-overview__tile + .fertilizer-overview__tile,
+  .fertilizer-overview__tile:last-child {
+    border-left: 1px solid var(--data-border);
+  }
+
+  .fertilizer-overview__tile > span {
+    font-size: 0.59rem;
+    letter-spacing: 0.045em;
+  }
+}
+
+/* Final base-row flattening layer. */
+.fertilizer-category--base {
+  gap: 0.2rem;
+}
+
+.fertilizer-category--base .fertilizer-category__header {
+  min-height: 44px;
+}
+
+.fertilizer-category--base .fertilizer-manufacturer-groups,
+.fertilizer-category--base .fertilizer-manufacturer-group,
+.fertilizer-category--base .fertilizer-card-grid {
+  gap: 0;
+}
+
+.fertilizer-category--base .fertilizer-manufacturer-group {
+  margin: 0;
+}
+
+.fertilizer-category--base .fertilizer-card__manufacturer {
+  margin-bottom: 0.1rem;
+}
+

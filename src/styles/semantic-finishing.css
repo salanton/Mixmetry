@@ -1,0 +1,125 @@
+/* Semantic color roles: teal is action, steel blue is information. */
+.fertilizer-card__media,
+.fertilizer-card__chip {
+  border-color: var(--data-border);
+  background: var(--data-soft);
+  color: var(--data);
+}
+
+.recipe-result__base-item small,
+.recipe-table__head {
+  color: var(--data);
+}
+
+.recipe-page .recipe-choice-button:focus-visible,
+.fertilizer-card:focus-visible,
+.fertilizer-library__preview:focus-visible {
+  border-color: var(--accent);
+  outline: 3px solid var(--accent-focus);
+  outline-offset: 2px;
+}
+
+.toggle-switch:checked + .toggle-switch__slider {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.chip--active {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.fertilizer-card--empty {
+  color: var(--accent-strong);
+}
+
+.reminder-button:hover {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--accent-strong) 88%, #000);
+}
+
+/* Color belongs to controls and data; card surfaces stay neutral. */
+.control-card::before,
+.schedule-card::before,
+.recipe-result::before,
+.fertilizer-category::before,
+.summary::before,
+.fertilizer-overview::before {
+  content: none;
+}
+
+/* Tank card: inputs first, calculated outcome as the visual anchor. */
+.control-card--tank .tank-result {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 0.08rem;
+  width: 100%;
+  min-height: 112px;
+  padding: 0.7rem 1rem 0.55rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: center;
+}
+
+.tank-result__value {
+  color: var(--data);
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Roboto Mono', monospace;
+  font-size: clamp(1.45rem, 2.4vw, 1.9rem);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.tank-result__date {
+  margin-top: 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 620;
+}
+
+.control-card--tank .tank-result .reminder-button {
+  width: auto;
+  min-height: 44px;
+  height: auto;
+  margin-top: 0.3rem;
+  padding: 0.3rem 0.45rem;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--accent-strong);
+  box-shadow: none;
+  font-size: 0.76rem;
+  font-weight: 780;
+}
+
+.control-card--tank .tank-result .reminder-button__text {
+  color: currentColor;
+}
+
+.control-card--tank .tank-result .reminder-button svg {
+  stroke: currentColor;
+}
+
+.control-card--tank .tank-result .reminder-button:hover {
+  border: 0;
+  background: var(--accent-soft);
+  box-shadow: none;
+  transform: none;
+}
+
+@media (max-width: 899px) {
+  .control-card--tank .tank-result {
+    min-height: 116px;
+    margin-top: 0.65rem;
+    padding: 0.7rem 1rem 0.45rem;
+  }
+}
+
+.fertilizer-details-actions__change--added {
+  border: 1px solid var(--success-border);
+  background: var(--success-soft);
+  color: var(--success);
+}

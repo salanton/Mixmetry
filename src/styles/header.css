@@ -1,0 +1,64 @@
+/* The header shares the page canvas instead of forming a separate color band. */
+.topbar {
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.topbar__brand {
+  min-height: 3rem;
+  gap: 0.5rem;
+}
+
+.topbar__mark {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.topbar__title {
+  font-size: 1.5rem;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.topbar__heading {
+  padding-right: 1.5rem;
+  padding-left: 0.5rem;
+}
+
+@media (max-width: 639px) {
+  .topbar {
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  .topbar__heading {
+    padding-inline: 0;
+  }
+
+  .topbar__brand {
+    min-height: 2.625rem;
+    gap: 0.5rem;
+  }
+
+  .topbar__mark {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .topbar__title {
+    font-size: 1.25rem;
+    transform: translateY(-0.5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top {
+    transition: none;
+  }
+
+  .swipe-track,
+  .swipe-viewport {
+    transition: none;
+  }
+}
+

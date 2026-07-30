@@ -1,0 +1,419 @@
+/* PWA base card: one large tap target; management lives in details. */
+.fertilizer-category--base .fertilizer-card--base {
+  position: relative;
+  grid-template-columns: 52px minmax(0, 1fr) 32px;
+  min-height: 86px;
+  margin-top: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--data-border);
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--data-soft) 185%);
+  box-shadow: 0 10px 24px -24px rgba(15, 23, 42, 0.55);
+}
+
+.fertilizer-category--base .fertilizer-card--base:hover {
+  border-color: var(--data);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--data-soft) 155%);
+}
+
+.fertilizer-category--base .fertilizer-card--base .fertilizer-card__media {
+  width: 52px;
+  height: 52px;
+  border-color: var(--data-border);
+  background: var(--data-soft);
+  color: var(--data);
+}
+
+.fertilizer-card--base .fertilizer-card__main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.fertilizer-card--base .fertilizer-card__main:focus-visible {
+  outline: none;
+}
+
+.fertilizer-card__base-description {
+  display: block;
+  max-width: 100%;
+  margin-top: 0.18rem;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fertilizer-card--base:has(.fertilizer-card__main:focus-visible) {
+  box-shadow: 0 0 0 3px var(--accent-focus);
+}
+
+.fertilizer-card__chevron {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 44px;
+  color: var(--data);
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.fertilizer-details-actions {
+  position: fixed;
+  inset: auto auto 1rem 50%;
+  z-index: 65;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  width: min(680px, calc(100vw - 2rem));
+  margin: 0;
+  padding: 0.25rem;
+  border: 1px solid color-mix(in srgb, var(--border-strong) 88%, transparent);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: 0 14px 34px -18px rgba(19, 35, 31, 0.58), 0 2px 8px rgba(19, 35, 31, 0.1);
+  backdrop-filter: blur(18px);
+  transform: translateX(-50%);
+}
+
+.fertilizer-details-modal .fertilizer-card__details {
+  padding-bottom: 5.5rem;
+}
+
+.fertilizer-details-actions__change,
+.fertilizer-details-actions__more {
+  min-height: 48px;
+  border-radius: var(--radius-control);
+  font-weight: 820;
+}
+
+.fertilizer-details-actions__change {
+  background: var(--accent-strong);
+  color: #fff;
+}
+
+.fertilizer-details-actions__more {
+  border: 1px solid var(--border-strong);
+  padding-inline: 1rem;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 0.82rem;
+}
+
+.fertilizer-details-actions--single {
+  grid-template-columns: 1fr;
+}
+
+.fertilizer-details-actions--single .fertilizer-details-actions__more {
+  width: 100%;
+}
+
+.fertilizer-details-actions__confirm {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 48px;
+  padding-left: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border));
+  border-radius: var(--radius-control);
+  background: var(--danger-soft);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+.fertilizer-details-actions__confirm button {
+  min-height: 40px;
+  padding-inline: 0.65rem;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.fertilizer-details-actions__delete {
+  background: var(--danger);
+  color: #fff;
+}
+
+@media (max-width: 639px) {
+  .fertilizer-tools-overlay--details {
+    align-items: start;
+    place-items: start stretch;
+    padding: 0;
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+
+  .fertilizer-category--base .fertilizer-card--base {
+    grid-template-columns: 44px minmax(0, 1fr) 28px;
+    min-height: 82px;
+    gap: 0.55rem;
+    padding: 0.6rem;
+  }
+
+  .fertilizer-category--base .fertilizer-card--base .fertilizer-card__media {
+    width: 44px;
+    height: 44px;
+  }
+
+  .fertilizer-card__chevron {
+    width: 28px;
+    height: 44px;
+  }
+
+  .fertilizer-details-modal {
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    padding-top: calc(1rem + env(safe-area-inset-top));
+    padding-bottom: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .fertilizer-details-modal > .fertilizer-tools__bar {
+    position: relative;
+    z-index: 2;
+    margin-top: calc(-1rem - env(safe-area-inset-top));
+    margin-inline: -1rem;
+    padding: calc(1rem + env(safe-area-inset-top)) 1rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .fertilizer-details-modal .fertilizer-card__details {
+    align-content: start;
+    grid-auto-rows: max-content;
+    min-height: 0;
+    margin-top: 0;
+    overflow-x: visible;
+    overflow-y: auto;
+    padding-bottom: 5rem;
+    scroll-padding-bottom: 5rem;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .fertilizer-details-modal .fertilizer-card__details::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fertilizer-details-actions {
+    inset: auto max(0.5rem, env(safe-area-inset-right)) calc(0.35rem + var(--mobile-safe-bottom)) max(0.5rem, env(safe-area-inset-left));
+    width: auto;
+    transform: none;
+  }
+
+  .fertilizer-details-actions__change,
+  .fertilizer-details-actions__more {
+    border-radius: 16px;
+  }
+
+  .fertilizer-dosage-table {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .fertilizer-dosage-table__row {
+    grid-template-columns: minmax(92px, 0.8fr) minmax(0, 1.2fr);
+    gap: 0.35rem;
+    padding-inline: 0.55rem;
+  }
+
+  .fertilizer-dosage-table__component {
+    min-width: 0;
+  }
+
+  .fertilizer-dosage-table__component small {
+    overflow: hidden;
+    font-size: 0.68rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fertilizer-dosage-table__row strong {
+    font-size: 0.78rem;
+  }
+
+  .fertilizer-details-actions__confirm {
+    grid-template-columns: 1fr 1fr;
+    padding: 0.5rem;
+  }
+
+  .fertilizer-details-actions__confirm > span {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 900px) {
+  .bento-grid,
+  .controls-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Fertilizer workspace alignment */
+.fertilizers-page {
+  gap: var(--space-3);
+}
+
+.fertilizer-overview {
+  position: relative;
+  display: grid;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.fertilizer-overview::before {
+  content: "";
+  position: absolute;
+  inset: 0.7rem auto 0.7rem 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+.fertilizer-overview__tile {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-width: 0;
+  min-height: 74px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-muted);
+  text-align: center;
+}
+
+.fertilizer-overview__tile--base {
+  justify-items: start;
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  text-align: left;
+}
+
+.fertilizer-overview__tile > span {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 820;
+  letter-spacing: 0.07em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.fertilizer-overview__tile strong {
+  max-width: 100%;
+  margin-top: 0.18rem;
+  color: var(--accent-strong);
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Roboto Mono', monospace;
+  font-size: 1.12rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fertilizer-overview__tile--base strong {
+  font-family: inherit;
+  font-size: 0.98rem;
+}
+
+.fertilizer-overview__tile small {
+  max-width: 100%;
+  margin-top: 0.12rem;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fertilizer-shelf {
+  gap: var(--space-3);
+}
+
+.fertilizer-category:nth-child(2n) {
+  background: var(--surface);
+}
+
+.fertilizer-category__header {
+  min-height: 48px;
+  align-items: center;
+}
+
+.fertilizer-category__title {
+  font-size: 1rem;
+  font-weight: 820;
+  letter-spacing: -0.018em;
+}
+
+.fertilizer-category__count {
+  height: 28px;
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Roboto Mono', monospace;
+  font-size: 0.78rem;
+}
+
+.fertilizer-manufacturer-group__title::after {
+  background: var(--border);
+}
+
+@media (max-width: 639px) {
+
+  .fertilizer-overview__tile--base {
+    grid-column: 1 / -1;
+  }
+
+  .fertilizer-overview__tile {
+    min-height: 68px;
+  }
+}
+
+/* Final fertilizer alignment layer. */
+.fertilizer-overview {
+  gap: 0;
+  border-color: var(--data-border);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--data-soft) 145%);
+}
+
+.fertilizer-overview::before,
+.fertilizer-category::before { background: var(--data); }
+
+.fertilizer-overview__tile,
+.fertilizer-overview__tile--base {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.fertilizer-overview__tile + .fertilizer-overview__tile { border-left: 1px solid var(--data-border); }
+.fertilizer-overview__tile strong,
+.fertilizer-category__count { color: var(--data); }
+.fertilizer-overview__tile--base strong { color: var(--text); }
+.fertilizer-category__count { border-color: var(--data-border); background: var(--data-soft); }
+.fertilizer-manufacturer-group__title { color: var(--text-muted); }
+.fertilizer-card-grid { gap: 0.55rem; }
+
+@media (max-width: 639px) {
+  .fertilizer-overview { gap: 0; }
+  .fertilizer-overview__tile--base { padding-bottom: 0.65rem; border-bottom: 1px solid var(--data-border); }
+  .fertilizer-overview__tile + .fertilizer-overview__tile { border-left: 0; }
+  .fertilizer-overview__tile:last-child { border-left: 1px solid var(--data-border); }
+}
+

@@ -16,7 +16,13 @@ import './styles/recipe.css'
 import './styles/fertilizers.css'
 import './styles/calculator.css'
 import './styles/responsive.css'
-import './styles/refinements.css'
+import './styles/polish.css'
+import './styles/density.css'
+import './styles/header.css'
+import './styles/fertilizer-refinements.css'
+import './styles/composition.css'
+import './styles/summary-refinements.css'
+import './styles/semantic-finishing.css'
 
 const PAGE_ORDER: PageId[] = ['calculator', 'fertilizers', 'recipe']
 const SWIPE_THRESHOLD = 48
