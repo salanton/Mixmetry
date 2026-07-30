@@ -307,6 +307,13 @@ const localizeDosageText = (value: string, language: 'ru' | 'en') => {
     .replace(/\bл\b/giu, 'L')
 }
 
+const formatRecipePerLiterValue = (value: string, language: 'ru' | 'en') =>
+  localizeDosageText(value, language)
+    .replace(/мл\/л/giu, 'мл')
+    .replace(/г\/л/giu, 'г')
+    .replace(/mL\/L/giu, 'mL')
+    .replace(/g\/L/giu, 'g')
+
 const formatStageDosageTotal = (
   fertilizer: FertilizerItem,
   stageId: PlantStageId,
@@ -1554,7 +1561,7 @@ function RecipePage({
                   {group.items.map((row) => (
                     <div className="recipe-table__row" key={`${row.fertilizer.id}-${row.component?.id ?? 'main'}`}>
                       <strong>{getRecipeRowName(row)}</strong>
-                      <span>{localizeDosageText(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
+                      <span>{formatRecipePerLiterValue(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
                       <span>{localizeDosageText(formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component), language)}</span>
                     </div>
                   ))}
@@ -1579,7 +1586,7 @@ function RecipePage({
                   {group.items.map((row) => (
                     <div className="recipe-table__row" key={`${row.fertilizer.id}-${row.component?.id ?? 'main'}`}>
                       <strong>{getRecipeRowName(row)}</strong>
-                      <span>{localizeDosageText(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
+                      <span>{formatRecipePerLiterValue(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
                       <span>{localizeDosageText(formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component), language)}</span>
                     </div>
                   ))}
@@ -1605,7 +1612,7 @@ function RecipePage({
                     <div className="recipe-table__row recipe-table__row--foliar" key={`${row.fertilizer.id}-${row.component?.id ?? 'main'}`}>
                       <strong>{getRecipeRowName(row)}</strong>
                       <span>{localizeDosageText(formatRecipeFoliarDose(row.fertilizer.foliarDose), language)}</span>
-                      <span>{localizeDosageText(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
+                      <span>{formatRecipePerLiterValue(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
                     </div>
                   ))}
                 </div>

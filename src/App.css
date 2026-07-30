@@ -1083,7 +1083,8 @@ body {
 
 .recipe-table__head span:nth-child(n + 2),
 .recipe-table__row span:nth-child(n + 2) {
-  text-align: right;
+  justify-self: stretch;
+  text-align: center;
 }
 
 .recipe-table__empty {
