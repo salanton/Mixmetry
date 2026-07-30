@@ -3685,7 +3685,7 @@ body {
     align-items: start;
     place-items: start stretch;
     padding: 0;
-    overflow-y: auto;
+    overflow: hidden;
     overscroll-behavior: contain;
   }
 
@@ -3707,14 +3707,18 @@ body {
   }
 
   .fertilizer-details-modal {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 0;
+    height: 100dvh;
     min-height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
     padding-top: calc(1rem + env(safe-area-inset-top));
     border-radius: 0;
   }
 
   .fertilizer-details-modal > .fertilizer-tools__bar {
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 2;
     margin-top: calc(-1rem - env(safe-area-inset-top));
     margin-inline: -1rem;
@@ -3724,15 +3728,20 @@ body {
   }
 
   .fertilizer-card__details {
+    min-height: 0;
+    margin-top: 0;
     overflow-x: visible;
-    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    padding-bottom: 1rem;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   .fertilizer-details-actions {
-    position: fixed;
-    inset: auto 0 0;
-    z-index: 80;
-    margin: 0;
+    position: relative;
+    inset: auto;
+    z-index: 2;
+    margin: 0 -1rem -1rem;
     padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
     box-shadow: 0 -12px 28px -22px rgba(15, 23, 42, 0.7);
   }

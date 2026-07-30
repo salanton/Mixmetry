@@ -1087,17 +1087,17 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
                   )
                 })}
               </div>
-              <div className="fertilizer-details-actions fertilizer-details-actions--single">
-                <button
-                  className={`fertilizer-details-actions__change ${fertilizerIds.has(selectedLibraryPreset.id) ? 'fertilizer-details-actions__change--added' : ''}`}
-                  type="button"
-                  aria-pressed={fertilizerIds.has(selectedLibraryPreset.id)}
-                  disabled={fertilizerIds.has(selectedLibraryPreset.id)}
-                  onClick={() => handleLibraryAdd(selectedLibraryPreset)}
-                >
-                  {fertilizerIds.has(selectedLibraryPreset.id) ? l('✓ Добавлено', '✓ Added') : l('Добавить', 'Add')}
-                </button>
-              </div>
+            </div>
+            <div className="fertilizer-details-actions fertilizer-details-actions--single">
+              <button
+                className={`fertilizer-details-actions__change ${fertilizerIds.has(selectedLibraryPreset.id) ? 'fertilizer-details-actions__change--added' : ''}`}
+                type="button"
+                aria-pressed={fertilizerIds.has(selectedLibraryPreset.id)}
+                disabled={fertilizerIds.has(selectedLibraryPreset.id)}
+                onClick={() => handleLibraryAdd(selectedLibraryPreset)}
+              >
+                {fertilizerIds.has(selectedLibraryPreset.id) ? l('✓ Добавлено', '✓ Added') : l('Добавить', 'Add')}
+              </button>
             </div>
           </section>
         </div>,
@@ -1160,47 +1160,47 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
                   )
                 })}
               </div>
-              <div className={`fertilizer-details-actions${selectedFertilizer.categoryId !== 'base' ? ' fertilizer-details-actions--single' : ''}`}>
-                {selectedFertilizer.categoryId === 'base' ? (
-                  <button
-                    className="fertilizer-details-actions__change"
-                    type="button"
-                    onClick={() => {
-                      closeFertilizerDetails()
-                      openAddFlow('base')
-                    }}
-                  >
-                    {l('Сменить базу', 'Change base')}
+            </div>
+            <div className={`fertilizer-details-actions${selectedFertilizer.categoryId !== 'base' ? ' fertilizer-details-actions--single' : ''}`}>
+              {selectedFertilizer.categoryId === 'base' ? (
+                <button
+                  className="fertilizer-details-actions__change"
+                  type="button"
+                  onClick={() => {
+                    closeFertilizerDetails()
+                    openAddFlow('base')
+                  }}
+                >
+                  {l('Сменить базу', 'Change base')}
+                </button>
+              ) : null}
+              {!isBaseDeleteConfirmOpen ? (
+                <button
+                  className="fertilizer-details-actions__more"
+                  type="button"
+                  onClick={() => setIsBaseDeleteConfirmOpen(true)}
+                >
+                  {selectedFertilizer.categoryId === 'base' ? l('Удалить', 'Delete') : l('Удалить добавку', 'Delete supplement')}
+                </button>
+              ) : (
+                <div className="fertilizer-details-actions__confirm" role="alert">
+                  <span>
+                    {selectedFertilizer.categoryId === 'base'
+                      ? l('Удалить базу из набора?', 'Remove the base nutrient from the collection?')
+                      : l('Удалить добавку из набора?', 'Remove the supplement from the collection?')}
+                  </span>
+                  <button type="button" onClick={() => setIsBaseDeleteConfirmOpen(false)}>
+                    {l('Отмена', 'Cancel')}
                   </button>
-                ) : null}
-                {!isBaseDeleteConfirmOpen ? (
                   <button
-                    className="fertilizer-details-actions__more"
+                    className="fertilizer-details-actions__delete"
                     type="button"
-                    onClick={() => setIsBaseDeleteConfirmOpen(true)}
+                    onClick={() => handleDelete(selectedFertilizer.id)}
                   >
-                    {selectedFertilizer.categoryId === 'base' ? l('Удалить', 'Delete') : l('Удалить добавку', 'Delete supplement')}
+                    {l('Удалить', 'Delete')}
                   </button>
-                ) : (
-                  <div className="fertilizer-details-actions__confirm" role="alert">
-                    <span>
-                      {selectedFertilizer.categoryId === 'base'
-                        ? l('Удалить базу из набора?', 'Remove the base nutrient from the collection?')
-                        : l('Удалить добавку из набора?', 'Remove the supplement from the collection?')}
-                    </span>
-                    <button type="button" onClick={() => setIsBaseDeleteConfirmOpen(false)}>
-                      {l('Отмена', 'Cancel')}
-                    </button>
-                    <button
-                      className="fertilizer-details-actions__delete"
-                      type="button"
-                      onClick={() => handleDelete(selectedFertilizer.id)}
-                    >
-                      {l('Удалить', 'Delete')}
-                    </button>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </section>
         </div>,

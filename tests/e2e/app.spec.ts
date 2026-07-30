@@ -59,7 +59,7 @@ test('adds, marks, persists and removes an additive', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'КалМаг Плюс' })).toHaveCount(0)
 })
 
-test('selects and replaces a base line and updates the recipe', async ({ page }) => {
+test('selects and replaces a base line and updates the recipe', async ({ page }, testInfo) => {
   await page.getByRole('button', { name: 'Мои удобрения' }).click()
   await page.getByRole('button', { name: '+ Выбрать базу' }).click()
   let dialog = page.getByRole('dialog', { name: 'Добавление удобрений' })
@@ -68,8 +68,16 @@ test('selects and replaces a base line and updates the recipe', async ({ page })
   await expect(page.getByRole('heading', { name: 'Кокос A+B' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Кокос A+B' }).click()
-  await page.getByRole('dialog', { name: 'Карточка удобрения Кокос A+B' })
-    .getByRole('button', { name: 'Сменить базу' }).click()
+  const baseDetails = page.getByRole('dialog', { name: 'Карточка удобрения Кокос A+B' })
+  if (testInfo.project.name.startsWith('mobile')) {
+    const actionGap = await baseDetails.evaluate((modal) => {
+      const actions = modal.querySelector('.fertilizer-details-actions')
+      if (!actions) return Number.POSITIVE_INFINITY
+      return Math.abs(modal.getBoundingClientRect().bottom - actions.getBoundingClientRect().bottom)
+    })
+    expect(actionGap).toBeLessThanOrEqual(1)
+  }
+  await baseDetails.getByRole('button', { name: 'Сменить базу' }).click()
   dialog = page.getByRole('dialog', { name: 'Добавление удобрений' })
   await dialog.getByRole('button', { name: /Simplex/ }).click()
   await dialog.getByRole('button', { name: 'Добавить ГидроВега A+B' }).click()
