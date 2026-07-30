@@ -4,6 +4,7 @@ import AppShell from './components/AppShell'
 import AppSettings from './components/AppSettings'
 import ControlCard from './components/ControlCard'
 import ControlsGrid from './components/ControlsGrid'
+import FertilizerDetailsModal from './components/FertilizerDetailsModal'
 import PageNavigation, { type PageId } from './components/PageNavigation'
 import SliderInput from './components/SliderInput'
 import { FERTILIZER_CATEGORIES, FERTILIZER_LIBRARY, GROW_METHODS, PLANT_STAGES } from './data/fertilizerLibrary'
@@ -609,64 +610,13 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
 
       {selectedLibraryPreset ? createPortal(
         <>
-        <div className="fertilizer-tools-overlay fertilizer-tools-overlay--details fertilizer-tools-overlay--stacked" role="presentation" onClick={closeLibraryDetails}>
-          <section
-            className="fertilizer-details-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label={l(`Описание удобрения ${selectedLibraryPreset.name}`, `${selectedLibraryPreset.name} nutrient details`)}
-            tabIndex={-1}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="fertilizer-tools__bar">
-              <div>
-                <p className="fertilizer-tools__eyebrow">{l('Из базы', 'From library')}</p>
-                <h2>{selectedLibraryPreset.name}</h2>
-                <p className="fertilizer-details-modal__meta">
-                  {selectedLibraryPreset.manufacturer}
-                </p>
-              </div>
-              <button
-                className="fertilizer-tools__close"
-                type="button"
-                onClick={closeLibraryDetails}
-                aria-label={l('Закрыть', 'Close')}
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="fertilizer-card__details">
-              <p>{getFertilizerCopy(selectedLibraryPreset, language).description}</p>
-              <div className="fertilizer-card__chips" aria-label={l('Поля описания', 'Product details')}>
-                {getFertilizerCopy(selectedLibraryPreset, language).details.map((detail) => (
-                  <span className="fertilizer-card__chip" key={detail}>
-                    {detail}
-                  </span>
-                ))}
-              </div>
-              <div className="fertilizer-dosage-table" aria-label={l('Дозировки по этапам', 'Dosage by growth stage')}>
-                <div className="fertilizer-dosage-table__row fertilizer-dosage-table__row--head">
-                  <span>{l('Этап', 'Stage')}</span>
-                  <strong>{l('Дозировка', 'Dosage')}</strong>
-                </div>
-                {PLANT_STAGES.map((stage) => {
-                  const display = getStageDisplay(stage, selectedLibraryPreset, language)
-
-                  return (
-                    <div className="fertilizer-dosage-table__row" key={stage.id}>
-                      <span className="fertilizer-dosage-table__stage">
-                        <span>{display.title}</span>
-                        {display.manufacturerTitle ? <small>{display.manufacturerTitle}</small> : null}
-                      </span>
-                      {renderDosageLabel(selectedLibraryPreset, stage.id)}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </section>
-        </div>
+        <FertilizerDetailsModal
+          fertilizer={selectedLibraryPreset}
+          language={language}
+          mode="library"
+          onClose={closeLibraryDetails}
+          renderDosageLabel={renderDosageLabel}
+        />
             <div className="fertilizer-details-actions fertilizer-details-actions--single">
               <button
                 className={`fertilizer-details-actions__change ${fertilizerIds.has(selectedLibraryPreset.id) ? 'fertilizer-details-actions__change--added' : ''}`}
@@ -684,64 +634,14 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
 
       {selectedFertilizer ? createPortal(
         <>
-        <div className="fertilizer-tools-overlay fertilizer-tools-overlay--details" role="presentation" onClick={closeFertilizerDetails}>
-          <section
-            className="fertilizer-details-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label={l(`Карточка удобрения ${selectedFertilizer.name}`, `${selectedFertilizer.name} nutrient card`)}
-            tabIndex={-1}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="fertilizer-tools__bar">
-              <div>
-                <p className="fertilizer-tools__eyebrow">{l('Удобрение', 'Nutrient')}</p>
-                <h2>{selectedFertilizer.name}</h2>
-                <p className="fertilizer-details-modal__meta">
-                  {selectedFertilizer.manufacturer} · {getSourceLabel()}
-                </p>
-              </div>
-              <button
-                className="fertilizer-tools__close"
-                type="button"
-                onClick={closeFertilizerDetails}
-                aria-label={l('Закрыть', 'Close')}
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="fertilizer-card__details">
-              <p>{getFertilizerCopy(selectedFertilizer, language).description}</p>
-              <div className="fertilizer-card__chips" aria-label={l('Поля описания', 'Product details')}>
-                {getFertilizerCopy(selectedFertilizer, language).details.map((detail) => (
-                  <span className="fertilizer-card__chip" key={detail}>
-                    {detail}
-                  </span>
-                ))}
-              </div>
-              <div className="fertilizer-dosage-table" aria-label={l('Дозировки по этапам', 'Dosage by growth stage')}>
-                <div className="fertilizer-dosage-table__row fertilizer-dosage-table__row--head">
-                  <span>{l('Этап', 'Stage')}</span>
-                  <strong>{l('Дозировка', 'Dosage')}</strong>
-                </div>
-                {PLANT_STAGES.map((stage) => {
-                  const display = getStageDisplay(stage, selectedFertilizer, language)
-
-                  return (
-                    <div className="fertilizer-dosage-table__row" key={stage.id}>
-                      <span className="fertilizer-dosage-table__stage">
-                        <span>{display.title}</span>
-                        {display.manufacturerTitle ? <small>{display.manufacturerTitle}</small> : null}
-                      </span>
-                      {renderDosageLabel(selectedFertilizer, stage.id)}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </section>
-        </div>
+        <FertilizerDetailsModal
+          fertilizer={selectedFertilizer}
+          language={language}
+          mode="selected"
+          sourceLabel={getSourceLabel()}
+          onClose={closeFertilizerDetails}
+          renderDosageLabel={renderDosageLabel}
+        />
             <div className={`fertilizer-details-actions${selectedFertilizer.categoryId !== 'base' ? ' fertilizer-details-actions--single' : ''}`}>
               {selectedFertilizer.categoryId === 'base' ? (
                 <button
