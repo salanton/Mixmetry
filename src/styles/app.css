@@ -19,8 +19,5 @@
 @import './header.css';
 @import './navigation.css';
 
-/* Ordered finishing pass; keep these refinements together. */
-@import './fertilizer-refinements.css';
-@import './composition.css';
-@import './summary-refinements.css';
-@import './semantic-finishing.css';
+/* Ordered finishing pass consolidated into one cascade boundary. */
+@import './refinements.css';
