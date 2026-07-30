@@ -67,6 +67,14 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
   await dialog.getByRole('button', { name: 'Добавить Кокос A+B' }).click()
   await expect(page.getByRole('heading', { name: 'Кокос A+B' })).toBeVisible()
 
+  await page.getByRole('button', { name: 'Мой рецепт' }).click()
+  await page.locator('.recipe-card--method .recipe-choice-button').click()
+  const picker = page.getByRole('dialog', { name: 'Выбор: Метод выращивания' })
+  await expect(picker.getByRole('button', { name: /Гидропоника/ }).getByLabel('Выбрано')).toBeVisible()
+  await expect(picker.getByRole('button', { name: /Кокос/ }).getByLabel('Соответствует выбранной базе')).toBeVisible()
+  await picker.getByRole('button', { name: 'Закрыть' }).click()
+  await page.getByRole('button', { name: 'Мои удобрения' }).click()
+
   await page.getByRole('button', { name: 'Кокос A+B' }).click()
   const baseDetails = page.getByRole('dialog', { name: 'Карточка удобрения Кокос A+B' })
   if (testInfo.project.name.startsWith('mobile')) {

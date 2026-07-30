@@ -216,11 +216,43 @@
   font-weight: 900;
 }
 
-.recipe-picker__option strong {
-  color: var(--accent-strong);
-  font-size: 0.78rem;
-  font-weight: 900;
+.recipe-picker__indicators {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.38rem;
   flex: 0 0 auto;
+  min-width: auto;
+}
+
+.recipe-picker__option .recipe-picker__indicator {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 1.55rem;
+  height: 1.55rem;
+  min-width: 1.55rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1;
+  overflow-wrap: normal;
+}
+
+.recipe-picker__option .recipe-picker__indicator--selected {
+  border-color: var(--accent-strong);
+  background: var(--accent-strong);
+  color: var(--surface);
+}
+
+.recipe-picker__option .recipe-picker__indicator--base {
+  border-color: var(--warning-border);
+  background: var(--warning-soft);
+  color: var(--warning);
+  font-size: 0.78rem;
 }
 
 .recipe-picker__option--active {

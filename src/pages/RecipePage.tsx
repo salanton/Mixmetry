@@ -41,6 +41,9 @@ const RecipePage = function RecipePage({
   const waterVolumeLiters = params.tankVolumeLiters
   const growMethodId = params.recipeGrowMethodId
   const plantStageId = params.recipePlantStageId
+  const baseGrowMethodId = fertilizers.find(
+    (fertilizer) => fertilizer.categoryId === 'base' && fertilizer.growMethodId !== 'any',
+  )?.growMethodId
   const selectedMethod = GROW_METHODS.find((method) => method.id === growMethodId)
   const selectedStage = PLANT_STAGES.find((stage) => stage.id === plantStageId)
   const pickerTitle = openRecipePicker === 'method'
@@ -132,29 +135,57 @@ const RecipePage = function RecipePage({
             <div className="recipe-picker__section">
               <h3>{pickerTitle}</h3>
               <div className="recipe-picker__list">
-                {openRecipePicker === 'method' ? GROW_METHODS.map((method) => (
-                  <button
-                    className={`recipe-picker__option ${growMethodId === method.id ? 'recipe-picker__option--active' : ''}`}
-                    key={method.id}
-                    type="button"
-                    aria-pressed={growMethodId === method.id}
-                    onClick={() => {
-                      updateParam('recipeGrowMethodId', method.id)
-                      setOpenRecipePicker(null)
-                    }}
-                  >
-                    <span>{language === 'ru' ? method.title : METHOD_EN[method.id]}</span>
-                    {growMethodId === method.id ? <strong>{l('Выбрано', 'Selected')}</strong> : null}
-                  </button>
-                )) : PLANT_STAGES.map((stage) => {
-                  const display = getStageDisplay(stage, stageLabelSource, language)
+                {openRecipePicker === 'method' ? GROW_METHODS.map((method) => {
+                  const isSelected = growMethodId === method.id
+                  const matchesBase = baseGrowMethodId === method.id
 
                   return (
                     <button
-                      className={`recipe-picker__option ${plantStageId === stage.id ? 'recipe-picker__option--active' : ''}`}
+                      className={`recipe-picker__option ${isSelected ? 'recipe-picker__option--active' : ''}`}
+                      key={method.id}
+                      type="button"
+                      aria-pressed={isSelected}
+                      onClick={() => {
+                        updateParam('recipeGrowMethodId', method.id)
+                        setOpenRecipePicker(null)
+                      }}
+                    >
+                      <span>{language === 'ru' ? method.title : METHOD_EN[method.id]}</span>
+                      {matchesBase || isSelected ? (
+                        <span className="recipe-picker__indicators">
+                          {matchesBase ? (
+                            <span
+                              className="recipe-picker__indicator recipe-picker__indicator--base"
+                              role="img"
+                              aria-label={l('Соответствует выбранной базе', 'Matches the selected base')}
+                              title={l('Соответствует выбранной базе', 'Matches the selected base')}
+                            >
+                              ★
+                            </span>
+                          ) : null}
+                          {isSelected ? (
+                            <span
+                              className="recipe-picker__indicator recipe-picker__indicator--selected"
+                              role="img"
+                              aria-label={l('Выбрано', 'Selected')}
+                            >
+                              ✓
+                            </span>
+                          ) : null}
+                        </span>
+                      ) : null}
+                    </button>
+                  )
+                }) : PLANT_STAGES.map((stage) => {
+                  const display = getStageDisplay(stage, stageLabelSource, language)
+                  const isSelected = plantStageId === stage.id
+
+                  return (
+                    <button
+                      className={`recipe-picker__option ${isSelected ? 'recipe-picker__option--active' : ''}`}
                       key={stage.id}
                       type="button"
-                      aria-pressed={plantStageId === stage.id}
+                      aria-pressed={isSelected}
                       onClick={() => {
                         updateParam('recipePlantStageId', stage.id)
                         setOpenRecipePicker(null)
@@ -167,7 +198,17 @@ const RecipePage = function RecipePage({
                         ) : null}
                         <small>{display.description}</small>
                       </span>
-                      {plantStageId === stage.id ? <strong>{l('Выбрано', 'Selected')}</strong> : null}
+                      {isSelected ? (
+                        <span className="recipe-picker__indicators">
+                          <span
+                            className="recipe-picker__indicator recipe-picker__indicator--selected"
+                            role="img"
+                            aria-label={l('Выбрано', 'Selected')}
+                          >
+                            ✓
+                          </span>
+                        </span>
+                      ) : null}
                     </button>
                   )
                 })}
