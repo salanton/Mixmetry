@@ -1,0 +1,142 @@
+:root {
+  --mobile-safe-bottom: min(env(safe-area-inset-bottom), 1rem);
+  --ivory: #f4f7f6;
+  --light-gray: #d8e1de;
+  --app-bg: var(--ivory);
+  --surface: #ffffff;
+  --surface-muted: #f8faf9;
+  --surface-soft: #edf3f1;
+  --border: #dce5e2;
+  --border-strong: #c7d4d0;
+  --text: #13231f;
+  --text-muted: #536660;
+  --text-soft: #63766f;
+  --accent: #219b86;
+  --accent-strong: #167a69;
+  --accent-soft: rgba(33, 155, 134, 0.11);
+  --accent-border: rgba(33, 155, 134, 0.34);
+  --accent-focus: rgba(33, 155, 134, 0.24);
+  --data: #3d6f8e;
+  --data-soft: rgba(61, 111, 142, 0.1);
+  --data-border: rgba(61, 111, 142, 0.28);
+  --success: #2f7d62;
+  --success-soft: rgba(47, 125, 98, 0.11);
+  --success-border: rgba(47, 125, 98, 0.34);
+  --cyan: var(--accent-strong);
+  --cyan-soft: var(--accent-soft);
+  --cyan-border: var(--accent-border);
+  --warning: #a66a1f;
+  --warning-soft: rgba(201, 133, 43, 0.12);
+  --warning-border: rgba(201, 133, 43, 0.35);
+  --white-accent: var(--ivory);
+  --white-accent-border: var(--border);
+  --danger: #b84f36;
+  --danger-soft: rgba(184, 79, 54, 0.1);
+  --action: var(--accent-strong);
+  --action-soft: var(--accent-soft);
+  --action-border: var(--accent-border);
+  --shadow-card: 0 1px 2px rgba(19, 35, 31, 0.04), 0 10px 28px -24px rgba(19, 35, 31, 0.28);
+  --shadow-panel: 0 24px 70px -30px rgba(19, 35, 31, 0.58);
+  --radius-control: 10px;
+  --radius-card: 16px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+}
+
+.recipe-result__disclaimer {
+  margin: 0.7rem 0 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+:root[data-theme="dark"] .page-tabs__button--calculator.page-tabs__button--active {
+  color: #76bde0;
+  border-color: rgba(118, 189, 224, 0.38);
+  background: rgba(91, 168, 205, 0.15);
+}
+
+:root[data-theme="dark"] .page-tabs__button--fertilizers.page-tabs__button--active {
+  color: #6bd2bd;
+  border-color: rgba(107, 210, 189, 0.36);
+  background: rgba(82, 188, 167, 0.15);
+}
+
+:root[data-theme="dark"] .page-tabs__button--recipe.page-tabs__button--active {
+  color: #beb4ee;
+  border-color: rgba(190, 180, 238, 0.36);
+  background: rgba(167, 155, 224, 0.15);
+}
+
+:root[data-standalone][data-system-constrained] {
+  --mobile-safe-bottom: 0px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ivory: #0f1715;
+  --light-gray: #2b3a35;
+  --app-bg: #0f1715;
+  --surface: #17211e;
+  --surface-muted: #1b2723;
+  --surface-soft: #1f2d28;
+  --border: #2b3c36;
+  --border-strong: #3a4e47;
+  --text: #ecf4f1;
+  --text-muted: #aebdb7;
+  --text-soft: #94a69f;
+  --accent-soft: rgba(64, 190, 165, 0.14);
+  --accent-border: rgba(83, 208, 182, 0.36);
+  --data-soft: rgba(104, 166, 202, 0.13);
+  --data-border: rgba(121, 181, 216, 0.3);
+  --success-soft: rgba(83, 181, 137, 0.14);
+  --success-border: rgba(83, 181, 137, 0.34);
+  --warning-soft: rgba(218, 155, 73, 0.14);
+  --warning-border: rgba(218, 155, 73, 0.36);
+  --danger: #e17a64;
+  --danger-soft: rgba(225, 122, 100, 0.14);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.18), 0 14px 34px -26px rgba(0, 0, 0, 0.9);
+  --shadow-panel: 0 28px 80px -28px rgba(0, 0, 0, 0.9);
+}
+
+:root[data-theme="dark"] .app-shell--calculator {
+  --accent: #5ba8cd;
+  --accent-strong: #76bde0;
+  --accent-soft: rgba(91, 168, 205, 0.15);
+  --accent-border: rgba(118, 189, 224, 0.38);
+  --accent-focus: rgba(118, 189, 224, 0.25);
+  --data: #76bde0;
+  --data-soft: rgba(91, 168, 205, 0.14);
+  --data-border: rgba(118, 189, 224, 0.3);
+}
+
+:root[data-theme="dark"] .app-shell--fertilizers {
+  --accent: #52bca7;
+  --accent-strong: #6bd2bd;
+  --accent-soft: rgba(82, 188, 167, 0.15);
+  --accent-border: rgba(107, 210, 189, 0.36);
+  --accent-focus: rgba(107, 210, 189, 0.24);
+  --data: #6bd2bd;
+  --data-soft: rgba(82, 188, 167, 0.13);
+  --data-border: rgba(107, 210, 189, 0.28);
+}
+
+:root[data-theme="dark"] .app-shell--recipe {
+  --accent: #a79be0;
+  --accent-strong: #beb4ee;
+  --accent-soft: rgba(167, 155, 224, 0.15);
+  --accent-border: rgba(190, 180, 238, 0.36);
+  --accent-focus: rgba(190, 180, 238, 0.24);
+  --data: #beb4ee;
+  --data-soft: rgba(167, 155, 224, 0.13);
+  --data-border: rgba(190, 180, 238, 0.28);
+}
+

@@ -10,7 +10,9 @@ import FertilizersPage from './pages/FertilizersPage'
 import RecipePage from './pages/RecipePage'
 import mixmetryMark from './assets/mixmetry-mark.svg'
 import { useAppPreferences } from './contexts/AppPreferencesContext'
-import './App.css'
+import './styles/tokens.css'
+import './styles/application.css'
+import './styles/refinements.css'
 
 const PAGE_ORDER: PageId[] = ['calculator', 'fertilizers', 'recipe']
 const SWIPE_THRESHOLD = 48
