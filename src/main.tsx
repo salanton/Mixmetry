@@ -10,32 +10,6 @@ const isStandalone = window.matchMedia('(display-mode: standalone)').matches
 
 document.documentElement.toggleAttribute('data-standalone', isStandalone)
 
-if ('serviceWorker' in navigator) {
-  let isReloadingForUpdate = false
-
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (isReloadingForUpdate) return
-    isReloadingForUpdate = true
-    window.location.reload()
-  })
-
-  const requestServiceWorkerUpdate = async () => {
-    try {
-      const registration = await navigator.serviceWorker.getRegistration()
-      await registration?.update()
-    } catch {
-      // Offline launches keep using the current cached application shell.
-    }
-  }
-
-  window.addEventListener('load', () => {
-    void requestServiceWorkerUpdate()
-  })
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') void requestServiceWorkerUpdate()
-  })
-}
-
 const syncStandaloneViewportMode = () => {
   const systemInset = Math.max(0, window.screen.height - window.innerHeight)
   document.documentElement.toggleAttribute('data-system-constrained', isStandalone && systemInset > 24)

@@ -322,6 +322,16 @@ test('shows the install hint only in a mobile browser, not in an installed PWA',
   test.skip(!testInfo.project.name.startsWith('mobile'), 'Mobile-only installation hint assertion')
 
   await expect(page.locator('.install-hint')).toBeVisible()
+  await expect(page.locator('.install-hint')).toContainText('Установите приложение через меню браузера')
+
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1',
+    })
+  })
+  await page.reload()
+  await expect(page.locator('.install-hint')).toContainText('в Safari нажмите «Поделиться»')
 
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'standalone', { configurable: true, value: true })

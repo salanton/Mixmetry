@@ -47,31 +47,25 @@ export const sanitizeFertilizers = (payload: unknown): FertilizerItem[] => {
   return items.length > 0 ? items : DEFAULT_FERTILIZERS
 }
 
+const readStoredFertilizers = (): FertilizerItem[] => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? sanitizeFertilizers(JSON.parse(raw)) : DEFAULT_FERTILIZERS
+  } catch {
+    return DEFAULT_FERTILIZERS
+  }
+}
+
 export const usePersistentFertilizers = () => {
-  const [fertilizers, setFertilizers] = useState<FertilizerItem[]>(DEFAULT_FERTILIZERS)
-  const [hydrated, setHydrated] = useState(false)
+  const [fertilizers, setFertilizers] = useState<FertilizerItem[]>(readStoredFertilizers)
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) {
-        setFertilizers(sanitizeFertilizers(JSON.parse(raw)))
-      }
-    } catch {
-      setFertilizers(DEFAULT_FERTILIZERS)
-    } finally {
-      setHydrated(true)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!hydrated) return
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(fertilizers))
     } catch {
       // The app remains usable when browser storage is unavailable or full.
     }
-  }, [fertilizers, hydrated])
+  }, [fertilizers])
 
   const fertilizerIds = useMemo(() => new Set(fertilizers.map((item) => item.id)), [fertilizers])
 
