@@ -11,7 +11,11 @@ import RecipePage from './pages/RecipePage'
 import mixmetryMark from './assets/mixmetry-mark.svg'
 import { useAppPreferences } from './contexts/AppPreferencesContext'
 import './styles/tokens.css'
-import './styles/application.css'
+import './styles/foundation.css'
+import './styles/recipe.css'
+import './styles/fertilizers.css'
+import './styles/calculator.css'
+import './styles/responsive.css'
 import './styles/refinements.css'
 
 const PAGE_ORDER: PageId[] = ['calculator', 'fertilizers', 'recipe']

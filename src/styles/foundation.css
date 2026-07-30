@@ -1,0 +1,321 @@
+/* Mixmetry design system — instrument pass */
+
+.app-error {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.app-error__panel {
+  width: min(440px, 100%);
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.app-error__eyebrow {
+  color: var(--accent-strong);
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-error__panel h1 {
+  margin-top: 0.35rem;
+  font-size: 1.35rem;
+}
+
+.app-error__panel p:not(.app-error__eyebrow) {
+  margin-top: 0.6rem;
+  color: var(--text-muted);
+}
+
+.app-error__panel button {
+  min-height: 44px;
+  margin-top: 1rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-control);
+  background: var(--accent-strong);
+  color: #fff;
+  font-weight: 780;
+}
+
+.app-shell {
+  --section-glow: rgba(61, 111, 142, 0.08);
+}
+
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 12% -10%, var(--section-glow), transparent 31rem);
+  transition: background 220ms ease;
+}
+
+.app-shell--calculator {
+  --accent: #3285aa;
+  --accent-strong: #286f91;
+  --accent-soft: rgba(50, 133, 170, 0.11);
+  --accent-border: rgba(50, 133, 170, 0.34);
+  --accent-focus: rgba(50, 133, 170, 0.24);
+  --data: #3d6f8e;
+  --data-soft: rgba(61, 111, 142, 0.1);
+  --data-border: rgba(61, 111, 142, 0.28);
+  --section-glow: rgba(50, 133, 170, 0.09);
+}
+
+.app-shell--fertilizers {
+  --accent: #219b86;
+  --accent-strong: #167a69;
+  --accent-soft: rgba(33, 155, 134, 0.11);
+  --accent-border: rgba(33, 155, 134, 0.34);
+  --accent-focus: rgba(33, 155, 134, 0.24);
+  --data: #326f64;
+  --data-soft: rgba(63, 127, 115, 0.1);
+  --data-border: rgba(63, 127, 115, 0.28);
+  --section-glow: rgba(33, 155, 134, 0.085);
+}
+
+.app-shell--recipe {
+  --accent: #756aac;
+  --accent-strong: #625893;
+  --accent-soft: rgba(117, 106, 172, 0.11);
+  --accent-border: rgba(117, 106, 172, 0.34);
+  --accent-focus: rgba(117, 106, 172, 0.24);
+  --data: #625d8f;
+  --data-soft: rgba(98, 93, 143, 0.1);
+  --data-border: rgba(98, 93, 143, 0.28);
+  --section-glow: rgba(117, 106, 172, 0.085);
+}
+
+.topbar {
+  padding-block: var(--space-3) var(--space-4);
+}
+
+.topbar__subtitle {
+  margin-top: 0.1rem;
+  letter-spacing: 0.01em;
+}
+
+.mobile-nav-dock {
+  display: none;
+}
+
+.fertilizer-category::before,
+.recipe-result::before {
+  background: var(--accent);
+}
+
+.control-card__title,
+.fertilizer-category__title,
+.schedule-card__title,
+.recipe-result__header h2 {
+  color: var(--text);
+  font-weight: 820;
+  letter-spacing: -0.018em;
+}
+
+.control-card__description,
+.fertilizer-category__description,
+.input-helper,
+.toggle-row__desc {
+  color: var(--text-muted);
+}
+
+.toggle-row__title,
+.fertilizer-card__title,
+.recipe-choice-button__value {
+  font-weight: 780;
+}
+
+.recipe-picker__close,
+.fertilizer-tools__close {
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+}
+
+.page-tabs__button:focus-visible,
+.recipe-choice-button:focus-visible,
+.recipe-picker__option:focus-visible,
+.recipe-picker__close:focus-visible,
+.fertilizer-tools__close:focus-visible,
+.fertilizer-library__item:focus-visible,
+.fertilizer-library__preview:focus-visible,
+.fertilizer-card__main:focus-visible,
+.fertilizer-card__add:focus-visible,
+.fertilizer-flow-actions__secondary:focus-visible,
+.reminder-button:focus-visible,
+.stepper__btn:focus-visible,
+.chip:focus-visible,
+.text-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-focus);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+.app-shell {
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: calc(1.25rem + env(safe-area-inset-top)) 1.25rem 1.5rem;
+}
+
+.topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0 1rem;
+  z-index: 10;
+}
+
+.back-to-top {
+  position: fixed;
+  top: calc(0.75rem + env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 35;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  color: var(--accent-strong);
+  background: var(--surface);
+  box-shadow: 0 12px 28px -18px rgba(19, 35, 31, 0.52), 0 2px 6px rgba(19, 35, 31, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-0.35rem);
+  transition: opacity 220ms ease-out, transform 240ms cubic-bezier(0.22, 1, 0.36, 1), visibility 220ms;
+}
+
+.back-to-top--visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.back-to-top svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.back-to-top:focus-visible {
+  outline: 3px solid var(--accent-focus);
+  outline-offset: 2px;
+}
+
+.swipe-viewport {
+  width: 100%;
+  min-height: 1px;
+  overflow: hidden;
+  transition: height 260ms cubic-bezier(0.22, 0.8, 0.32, 1);
+}
+
+.swipe-track {
+  --swipe-page-gap: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--swipe-page-gap);
+  width: calc(300% + (var(--swipe-page-gap) * 2));
+  height: 100%;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.swipe-panel {
+  flex: 0 0 calc((100% - (var(--swipe-page-gap) * 2)) / 3);
+  height: max-content;
+  min-width: 0;
+}
+
+.topbar__heading {
+  min-width: 0;
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+}
+
+.topbar__mark {
+  flex: 0 0 auto;
+}
+
+.page-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  flex: 0 1 460px;
+  min-width: 0;
+}
+
+.page-tabs__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.page-tabs__icon,
+.page-tabs__label--mobile {
+  display: none;
+}
+
+.page-tabs__button:focus-visible,
+.recipe-picker__close:focus-visible,
+.fertilizer-tools__close:focus-visible,
+.fertilizer-library__card:focus-visible,
+.fertilizer-card__main:focus-visible,
+.fertilizer-card__add:focus-visible,
+.fertilizer-flow-actions__secondary:focus-visible,
+.reminder-button:focus-visible,
+.stepper__btn:focus-visible,
+.chip:focus-visible,
+.text-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-focus);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+}
+
+.fertilizers-page {
+  display: flex;
+  flex-direction: column;
+}
+

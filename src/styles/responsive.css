@@ -1,0 +1,241 @@
+@media (max-width: 640px) {
+  .app-shell {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .page-tabs {
+    flex-basis: auto;
+    width: 100%;
+  }
+
+  .page-tabs__button {
+    padding-inline: 0.4rem;
+    white-space: normal;
+  }
+
+  .control-card__header {
+    flex-direction: column;
+  }
+
+  .recipe-card,
+  .recipe-card--method,
+  .recipe-card--stage,
+  .recipe-page .control-card {
+    min-height: 0;
+  }
+
+  .recipe-page .control-card {
+    height: auto;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .recipe-page > .controls-grid {
+    align-items: start;
+  }
+
+  .recipe-page .control-card__body {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    gap: 0.45rem;
+    margin-top: 0.5rem;
+  }
+
+  .recipe-choice-button {
+    min-height: 44px;
+    padding-block: 0.5rem;
+    border-radius: 12px;
+  }
+
+  .recipe-choice-button__chevron {
+    right: 0.7rem;
+  }
+
+  .schedule-table__head,
+  .schedule-table__row,
+  .schedule-table__footer {
+    grid-template-columns: minmax(40px, auto) 1fr 1fr 1fr;
+    font-size: 0.95rem;
+  }
+
+  .schedule-table--time-only .schedule-table__head,
+  .schedule-table--time-only .schedule-table__row,
+  .schedule-table--time-only .schedule-table__footer {
+    grid-template-columns: minmax(40px, auto) 1fr;
+  }
+
+  .schedule-table--no-per-plant .schedule-table__head,
+  .schedule-table--no-per-plant .schedule-table__row,
+  .schedule-table--no-per-plant .schedule-table__footer {
+    grid-template-columns: minmax(40px, auto) 1fr 1fr;
+  }
+
+  .stepper__controls {
+    grid-template-columns: 64px 1fr 64px;
+  }
+
+  .reminder-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .recipe-picker-overlay {
+    align-items: end;
+    place-items: end stretch;
+    padding: 0.75rem;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+
+  .recipe-picker {
+    width: 100%;
+    max-height: min(84vh, 680px);
+    border-radius: 16px;
+  }
+
+  .recipe-result__header {
+    flex-direction: column;
+  }
+
+  .recipe-result__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .recipe-result__tile {
+    min-height: 0;
+  }
+
+  .recipe-table__head,
+  .recipe-table__row {
+    grid-template-columns: minmax(96px, 1fr) minmax(72px, 0.72fr) minmax(72px, 0.72fr);
+    gap: 0.4rem;
+    font-size: 0.82rem;
+  }
+
+  .fertilizer-tools-overlay {
+    align-items: end;
+    place-items: end stretch;
+    padding: 0.75rem;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+
+  .fertilizer-tools {
+    width: 100%;
+    max-height: min(84vh, 720px);
+    border-radius: 16px;
+  }
+
+  .fertilizer-flow-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .fertilizer-flow-actions__secondary {
+    width: 100%;
+  }
+
+  .fertilizer-category {
+    padding: 0.85rem;
+  }
+
+  .fertilizer-category__header {
+    align-items: center;
+  }
+
+  .fertilizer-card-grid {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fertilizer-card {
+    flex: 0 1 auto;
+    width: 100%;
+    padding: 0.65rem;
+    gap: 0.6rem;
+  }
+
+  .fertilizer-card__media {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+  }
+
+  .fertilizer-card__badge-text--dense {
+    font-size: 0.56rem;
+  }
+
+  .fertilizer-card__body {
+    gap: 0.2rem;
+  }
+
+  .fertilizer-card__title {
+    font-size: 0.94rem;
+  }
+
+  .fertilizer-card__meta {
+    font-size: 0.78rem;
+    line-height: 1.22;
+  }
+
+  .fertilizer-details-modal {
+    width: 100%;
+    border-radius: 16px;
+  }
+}
+
+@media (min-width: 900px) {
+  .control-card--drips {
+    grid-column: 1 / -1;
+  }
+
+  .control-card--drips .control-card__body {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.2rem;
+    align-items: start;
+  }
+
+  .control-card--tank {
+    grid-column: 1 / -1;
+  }
+
+  .control-card--tank .control-card__body {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.2rem;
+    align-items: center;
+    justify-items: center;
+  }
+
+  .control-card--tank .tank-result {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .control-card--tank .slider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .control-card--tank .reminder-button {
+    width: 100%;
+    max-width: 100%;
+    align-self: stretch;
+    height: 100%;
+    min-height: auto;
+  }
+
+
+}
+
