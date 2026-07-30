@@ -31,7 +31,6 @@ const SWIPE_THRESHOLD = 48
 const SWIPE_FLICK_THRESHOLD = 28
 const SWIPE_FLICK_DURATION = 300
 const MOBILE_SWIPE_QUERY = '(max-width: 639px)'
-const MOBILE_HEADER_TRAVEL = 56
 const SWIPE_BLOCK_SELECTOR = [
   'button',
   'a',
@@ -58,15 +57,12 @@ function App() {
   } | null>(null)
   const swipeViewportRef = useRef<HTMLElement | null>(null)
   const swipeTrackRef = useRef<HTMLDivElement | null>(null)
-  const topbarRef = useRef<HTMLElement | null>(null)
   const swipePanelRefs = useRef<Record<PageId, HTMLDivElement | null>>({
     calculator: null,
     fertilizers: null,
     recipe: null,
   })
   const swipeTransitionTimeout = useRef<number | null>(null)
-  const mobileHeaderFrame = useRef<number | null>(null)
-  const pendingHeaderScrollTop = useRef(0)
   const isSwipeTransitioning = useRef(false)
   const persistentParams = usePersistentParams()
   const persistentFertilizers = usePersistentFertilizers()
@@ -75,29 +71,12 @@ function App() {
   const isMobileSwipeLayout = () => window.matchMedia(MOBILE_SWIPE_QUERY).matches
 
   const syncMobileHeader = (scrollTop: number) => {
-    pendingHeaderScrollTop.current = scrollTop
-    if (mobileHeaderFrame.current !== null) return
-
-    mobileHeaderFrame.current = window.requestAnimationFrame(() => {
-      mobileHeaderFrame.current = null
-      const topbar = topbarRef.current
-      if (!topbar) return
-      const progress = Math.min(pendingHeaderScrollTop.current / MOBILE_HEADER_TRAVEL, 1)
-      const easedProgress = progress * progress * (3 - 2 * progress)
-      const travel = easedProgress * MOBILE_HEADER_TRAVEL
-      topbar.style.setProperty('--mobile-header-offset', `${-travel}px`)
-      topbar.style.setProperty('--mobile-header-opacity', `${1 - easedProgress}`)
-      topbar.style.pointerEvents = progress >= 1 ? 'none' : ''
-    })
     setIsHeaderScrolled(scrollTop > 280)
   }
 
   useEffect(() => {
     const updateHeaderState = () => {
       if (isMobileSwipeLayout()) return
-      topbarRef.current?.style.removeProperty('--mobile-header-offset')
-      topbarRef.current?.style.removeProperty('--mobile-header-opacity')
-      if (topbarRef.current) topbarRef.current.style.pointerEvents = ''
       setIsHeaderScrolled(window.scrollY > 280)
     }
 
@@ -173,7 +152,6 @@ function App() {
 
   useEffect(() => () => {
     if (swipeTransitionTimeout.current !== null) window.clearTimeout(swipeTransitionTimeout.current)
-    if (mobileHeaderFrame.current !== null) window.cancelAnimationFrame(mobileHeaderFrame.current)
   }, [])
 
   const selectPage = (page: PageId) => {
@@ -304,7 +282,7 @@ function App() {
         if (wasHorizontal) settleSwipeBack(PAGE_ORDER.indexOf(activePage))
       }}
     >
-      <header ref={topbarRef} className="topbar">
+      <header className="topbar">
         <div className="topbar__heading">
           <div className="topbar__brand">
             <img className="topbar__mark" src={mixmetryMark} alt="" />
