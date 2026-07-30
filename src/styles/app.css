@@ -1,0 +1,26 @@
+/*
+ * Application stylesheet entrypoint.
+ *
+ * Keep the cascade order here instead of coupling it to component imports.
+ * Foundation and page primitives load first; responsive and interaction layers
+ * follow; the final group only refines already-defined components.
+ */
+@import './tokens.css';
+@import './foundation.css';
+@import './recipe.css';
+@import './fertilizers.css';
+@import './calculator.css';
+@import './responsive.css';
+
+/* Cross-page density and interaction layers. */
+@import './polish.css';
+@import './density.css';
+@import './settings.css';
+@import './header.css';
+@import './navigation.css';
+
+/* Ordered finishing pass; keep these refinements together. */
+@import './fertilizer-refinements.css';
+@import './composition.css';
+@import './summary-refinements.css';
+@import './semantic-finishing.css';
