@@ -7,14 +7,20 @@ import {
   type UIEvent as ReactUIEvent,
 } from 'react'
 import type { PageId } from '../components/PageNavigation'
+import {
+  SWIPE_TRANSITION_EASING,
+  SWIPE_TRANSITION_MS,
+  getAdjacentPageIndex,
+  getSwipeDragOffset,
+  interpolateSwipeHeight,
+  isHorizontalSwipe,
+  resolveSwipeAxis,
+  shouldCompleteSwipe,
+  type SwipeAxis,
+} from '../utils/swipeNavigation'
 
 const PAGE_ORDER: PageId[] = ['calculator', 'fertilizers', 'recipe']
-const SWIPE_THRESHOLD = 48
-const SWIPE_FLICK_THRESHOLD = 28
-const SWIPE_FLICK_DURATION = 300
-const SWIPE_TRANSITION_MS = 380
 const SWIPE_TRANSITION_FALLBACK_MS = SWIPE_TRANSITION_MS + 80
-const SWIPE_TRANSITION_EASING = 'cubic-bezier(0.22, 0.92, 0.3, 1)'
 const MOBILE_SWIPE_QUERY = '(max-width: 639px)'
 const SWIPE_BLOCK_SELECTOR = [
   'button',
@@ -33,7 +39,7 @@ type SwipeStart = {
   x: number
   y: number
   time: number
-  axis: 'x' | 'y' | null
+  axis: SwipeAxis
   viewportWidth: number
   panelHeights: number[]
 }
@@ -221,27 +227,19 @@ export const useSwipeNavigation = () => {
     const touch = event.touches[0]
     const deltaX = touch.clientX - start.x
     const deltaY = touch.clientY - start.y
-    if (!start.axis && Math.max(Math.abs(deltaX), Math.abs(deltaY)) >= 7) {
-      start.axis = Math.abs(deltaX) > Math.abs(deltaY) * 1.04 ? 'x' : 'y'
-    }
+    start.axis = resolveSwipeAxis(start.axis, deltaX, deltaY)
     if (start.axis !== 'x') return
 
     event.preventDefault()
     const currentIndex = PAGE_ORDER.indexOf(activePage)
-    const adjacentIndex = currentIndex + (deltaX < 0 ? 1 : -1)
-    const isOutsideStart = currentIndex === 0 && deltaX > 0
-    const isOutsideEnd = currentIndex === PAGE_ORDER.length - 1 && deltaX < 0
-    const dragOffset = isOutsideStart || isOutsideEnd
-      ? Math.sign(deltaX) * Math.pow(Math.abs(deltaX), 0.72) * 0.72
-      : deltaX
+    const adjacentIndex = getAdjacentPageIndex(currentIndex, deltaX)
+    const dragOffset = getSwipeDragOffset(deltaX, currentIndex, PAGE_ORDER.length - 1)
     positionSwipeTrack(currentIndex, dragOffset)
 
     const currentHeight = start.panelHeights[currentIndex] ?? 0
     const adjacentHeight = start.panelHeights[adjacentIndex] ?? 0
     if (adjacentHeight) {
-      const progress = Math.min(Math.abs(deltaX) / start.viewportWidth, 1)
-      const interpolatedHeight = currentHeight + ((adjacentHeight - currentHeight) * progress)
-      resizeSwipeViewport(Math.max(currentHeight, interpolatedHeight))
+      resizeSwipeViewport(interpolateSwipeHeight(currentHeight, adjacentHeight, deltaX, start.viewportWidth))
     } else if (currentHeight) {
       resizeSwipeViewport(currentHeight)
     }
@@ -254,21 +252,16 @@ export const useSwipeNavigation = () => {
 
     const touch = event.changedTouches[0]
     const deltaX = touch.clientX - start.x
-    const distance = Math.abs(deltaX)
     const deltaY = touch.clientY - start.y
     const duration = performance.now() - start.time
-    const velocity = distance / Math.max(duration, 1)
-    const isQuickFlick = duration <= SWIPE_FLICK_DURATION && distance >= SWIPE_FLICK_THRESHOLD
     const currentIndex = PAGE_ORDER.indexOf(activePage)
-    const isHorizontal = start.axis === 'x' || (start.axis === null && distance > Math.abs(deltaY) * 1.04)
-    if (!isHorizontal) return
-    if ((!isQuickFlick && distance < SWIPE_THRESHOLD) && velocity < 0.38) {
+    if (!isHorizontalSwipe(start.axis, deltaX, deltaY)) return
+    if (!shouldCompleteSwipe(start.axis, deltaX, deltaY, duration)) {
       settleSwipeBack(currentIndex)
       return
     }
 
-    const direction = deltaX < 0 ? 1 : -1
-    const nextIndex = currentIndex + direction
+    const nextIndex = getAdjacentPageIndex(currentIndex, deltaX)
     const nextPage = PAGE_ORDER[nextIndex]
     if (!nextPage) {
       settleSwipeBack(currentIndex)
