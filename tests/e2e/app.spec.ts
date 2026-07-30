@@ -179,6 +179,31 @@ test('applies and persists language and theme preferences', async ({ page }) => 
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 })
 
+test('translates every product flow while preserving nutrient names', async ({ page }) => {
+  await page.getByRole('button', { name: 'Открыть настройки' }).click()
+  await page.getByRole('dialog', { name: 'Настройки' }).getByText('English', { exact: true }).click()
+  await page.getByRole('button', { name: 'Close settings' }).click()
+
+  await expect(page.getByRole('heading', { name: 'Plant light cycle' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Watering schedule' })).toBeVisible()
+
+  await page.getByRole('button', { name: 'My nutrients' }).click()
+  await expect(page.getByRole('heading', { name: 'Base nutrients' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Supplements and stimulants' })).toBeVisible()
+  await page.getByRole('button', { name: '+ Add nutrient' }).click()
+  const library = page.getByRole('dialog', { name: 'Add nutrients' })
+  await expect(library.getByRole('heading', { name: 'Manufacturers' })).toBeVisible()
+  await library.getByRole('button', { name: /Simplex/ }).click()
+  await expect(library.getByText('КалМаг Плюс', { exact: true })).toBeVisible()
+  await expect(library.getByText(/Plant supplement for all growing media/).first()).toBeVisible()
+  await library.getByRole('button', { name: 'Close' }).click()
+
+  await page.getByRole('button', { name: 'My recipe' }).click()
+  await expect(page.getByRole('heading', { name: 'Growing method' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Calculation results' })).toBeVisible()
+  await expect(page.getByText(/This calculation is for reference only/)).toBeVisible()
+})
+
 test('keeps the mobile navigation fixed and content within the viewport', async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith('mobile'), 'Mobile-only layout assertion')
 

@@ -57,6 +57,52 @@ type RecipeRow = {
 }
 type PersistentParams = ReturnType<typeof usePersistentParams>
 
+const STAGE_EN: Record<PlantStageId, { title: string; description: string }> = {
+  seedling: { title: 'Germination and rooting', description: 'First roots and the first pair of true leaves' },
+  earlyVeg: { title: 'Vegetative growth', description: 'Early active vegetative growth' },
+  veg: { title: 'Pre-flowering', description: 'Late vegetative growth and the first signs of flowering' },
+  preFlower: { title: 'Early flowering', description: 'Reduced vertical growth and flower development' },
+  earlyBloom: { title: 'Flower development', description: 'Flower bulking and reduced vertical growth' },
+  midBloom: { title: 'Ripening', description: 'Final flower ripening' },
+  lateBloom: { title: 'Flushing', description: 'Preparing the plant for harvest' },
+}
+
+const METHOD_EN: Record<string, string> = {
+  hydro: 'Hydroponics',
+  coco: 'Coco',
+  soil: 'Soil',
+  any: 'All growing media',
+}
+
+const getCategoryCopy = (categoryId: FertilizerCategoryId, language: 'ru' | 'en') => {
+  if (language === 'ru') return FERTILIZER_CATEGORIES.find((category) => category.id === categoryId)
+  return categoryId === 'base'
+    ? { id: categoryId, title: 'Base nutrients', description: 'Primary nutrients for the growing cycle' }
+    : { id: categoryId, title: 'Supplements and stimulants', description: 'Boosters, stimulants and supporting additives' }
+}
+
+const getFertilizerCopy = (item: FertilizerItem, language: 'ru' | 'en') => {
+  if (language === 'ru') {
+    return { shortDescription: item.shortDescription, description: item.description, details: item.details }
+  }
+
+  const method = METHOD_EN[item.growMethodId] ?? 'the selected growing medium'
+  const category = item.categoryId === 'base' ? 'base nutrient' : 'plant supplement'
+  const application = item.application === 'foliar' ? 'foliar application' : 'the nutrient solution'
+  return {
+    shortDescription: `${category === 'base nutrient' ? 'Base nutrition' : 'Plant supplement'} for ${method.toLowerCase()}`,
+    description: `${item.name} by ${item.manufacturer} is a ${category} intended for ${method.toLowerCase()}. Use the stage dosage table below as a reference and confirm the current instructions on the product label before mixing.`,
+    details: [
+      `Growing method: ${method}`,
+      `Application: ${application}`,
+      item.components?.length
+        ? `Components: ${item.components.map((component) => component.name).join(' and ')}`
+        : 'Dosage: shown for each growth stage',
+      `Dosage source: ${item.manufacturer} product or application chart`,
+    ],
+  }
+}
+
 const PageIcon = ({ page }: { page: PageId }) => {
   if (page === 'calculator') {
     return (
@@ -246,6 +292,20 @@ const formatRecipeFoliarDose = (dose?: string) =>
         .trim()
     : '—'
 
+const localizeDosageText = (value: string, language: 'ru' | 'en') => {
+  if (language === 'ru') return value
+  return value
+    .replace(/мл\/л/giu, 'mL/L')
+    .replace(/г\/л/giu, 'g/L')
+    .replace(/мл/giu, 'mL')
+    .replace(/(?:ст\.\s*)?ложки/giu, 'tbsp')
+    .replace(/капли?/giu, 'drops')
+    .replace(/субстрата/giu, 'of substrate')
+    .replace(/раствора/giu, 'of solution')
+    .replace(/при смене раствора/giu, 'per solution change')
+    .replace(/\bл\b/giu, 'L')
+}
+
 const formatStageDosageTotal = (
   fertilizer: FertilizerItem,
   stageId: PlantStageId,
@@ -270,8 +330,16 @@ const formatStageDosageTotal = (
 const getRecipeRowName = (row: RecipeRow) =>
   row.component?.name ?? row.fertilizer.name
 
-const getStageDisplay = (stage: PlantStage, fertilizer?: FertilizerItem | null) => {
+const getStageDisplay = (stage: PlantStage, fertilizer?: FertilizerItem | null, language: 'ru' | 'en' = 'ru') => {
   const label = fertilizer?.stageLabels?.[stage.id]
+
+  if (language === 'en') {
+    return {
+      ...STAGE_EN[stage.id],
+      manufacturerTitle: undefined,
+      manufacturerDescription: undefined,
+    }
+  }
 
   return {
     title: stage.title,
@@ -575,6 +643,8 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
 }
 
 function FertilizersPage() {
+  const { language } = useAppPreferences()
+  const l = (ru: string, en: string) => language === 'ru' ? ru : en
   const [selectedFertilizerId, setSelectedFertilizerId] = useState<string | null>(null)
   const [selectedLibraryPresetId, setSelectedLibraryPresetId] = useState<string | null>(null)
   const [addFlowCategoryId, setAddFlowCategoryId] = useState<FertilizerCategoryId | null>(null)
@@ -588,7 +658,6 @@ function FertilizersPage() {
     deleteFertilizer,
   } = usePersistentFertilizers()
 
-  const selectedAddCategory = FERTILIZER_CATEGORIES.find((category) => category.id === addFlowCategoryId)
   const selectedFertilizer = fertilizers.find((item) => item.id === selectedFertilizerId)
   const selectedLibraryPreset = FERTILIZER_LIBRARY.find((item) => item.id === selectedLibraryPresetId)
   const categoryLibraryItems = FERTILIZER_LIBRARY.filter(
@@ -692,7 +761,7 @@ function FertilizersPage() {
   const getDosageLabel = (
     item: FertilizerItem,
     stageId: (typeof PLANT_STAGES)[number]['id'],
-  ) => formatStageDosage(item, stageId)
+  ) => localizeDosageText(formatStageDosage(item, stageId), language)
 
   const renderDosageLabel = (item: FertilizerItem, stageId: (typeof PLANT_STAGES)[number]['id']) => {
     if (!item.components?.length) return <strong>{getDosageLabel(item, stageId)}</strong>
@@ -702,16 +771,17 @@ function FertilizersPage() {
         {item.components.map((component) => (
           <span className="fertilizer-dosage-table__component" key={component.id}>
             <small>{component.name}</small>
-            <strong>{formatRecipeDosage(item, stageId, item.growMethodId, component)}</strong>
+            <strong>{localizeDosageText(formatRecipeDosage(item, stageId, item.growMethodId, component), language)}</strong>
           </span>
         ))}
       </div>
     )
   }
 
-  const getSourceLabel = () => 'Из базы'
+  const getSourceLabel = () => l('Из базы', 'From library')
   const renderFertilizerCard = (item: FertilizerItem, showBaseActions = false) => {
     const badge = formatFertilizerBadge(item.name)
+    const copy = getFertilizerCopy(item, language)
 
     return (
       <article
@@ -737,12 +807,12 @@ function FertilizersPage() {
                 ) : null}
                 <h3 className="fertilizer-card__title">{item.name}</h3>
                 {showBaseActions ? (
-                  <span className="fertilizer-card__base-description">{item.shortDescription}</span>
+                  <span className="fertilizer-card__base-description">{copy.shortDescription}</span>
                 ) : null}
               </span>
             </button>
           </div>
-          {!showBaseActions ? <p className="fertilizer-card__meta">{item.shortDescription}</p> : null}
+          {!showBaseActions ? <p className="fertilizer-card__meta">{copy.shortDescription}</p> : null}
         </div>
         {showBaseActions ? (
           <span className="fertilizer-card__chevron" aria-hidden="true">›</span>
@@ -754,7 +824,7 @@ function FertilizersPage() {
   return (
     <section
       className="fertilizers-page"
-      aria-label="Удобрения"
+      aria-label={l('Удобрения', 'Nutrients')}
     >
       {addFlowCategoryId ? createPortal(
         <div className="fertilizer-tools-overlay" role="presentation" onClick={closeAddFlow}>
@@ -762,16 +832,16 @@ function FertilizersPage() {
             className="fertilizer-tools"
             role="dialog"
             aria-modal="true"
-            aria-label="Добавление удобрений"
+            aria-label={l('Добавление удобрений', 'Add nutrients')}
             tabIndex={-1}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="fertilizer-tools__bar">
               <div>
-                <p className="fertilizer-tools__eyebrow">Добавление</p>
-                <h2>{selectedAddCategory?.title ?? 'Удобрение'}</h2>
+                <p className="fertilizer-tools__eyebrow">{l('Добавление', 'Add')}</p>
+                <h2>{addFlowCategoryId ? getCategoryCopy(addFlowCategoryId, language)?.title : l('Удобрение', 'Nutrient')}</h2>
               </div>
-              <button className="fertilizer-tools__close" type="button" onClick={closeAddFlow} aria-label="Закрыть">
+              <button className="fertilizer-tools__close" type="button" onClick={closeAddFlow} aria-label={l('Закрыть', 'Close')}>
                 ×
               </button>
             </div>
@@ -779,12 +849,12 @@ function FertilizersPage() {
             <section className="fertilizer-library" aria-labelledby="fertilizer-library-title">
                 <div className="fertilizer-form__header">
                   <h2 id="fertilizer-library-title">
-                    {selectedManufacturer ?? 'Список производителей'}
+                    {selectedManufacturer ?? l('Список производителей', 'Manufacturers')}
                   </h2>
                   <p>
                     {selectedManufacturer
-                      ? 'Выберите удобрение этого производителя.'
-                      : 'Сначала выберите производителя, потом конкретное удобрение.'}
+                      ? l('Выберите удобрение этого производителя.', 'Choose a nutrient from this manufacturer.')
+                      : l('Сначала выберите производителя, потом конкретное удобрение.', 'Choose a manufacturer, then select a nutrient.')}
                   </p>
                 </div>
                 {!selectedManufacturer ? (
@@ -804,14 +874,14 @@ function FertilizersPage() {
                           >
                             <span>
                               <strong>{manufacturer}</strong>
-                              <small>{manufacturerItemsCount} поз.</small>
+                              <small>{manufacturerItemsCount} {l('поз.', 'items')}</small>
                             </span>
                             <span className="fertilizer-library__plus">→</span>
                           </button>
                         )
                       })
                     ) : (
-                      <p className="fertilizer-library__empty">Для этой категории все шаблоны уже добавлены.</p>
+                      <p className="fertilizer-library__empty">{l('Для этой категории все шаблоны уже добавлены.', 'All available items in this category have already been added.')}</p>
                     )}
                   </div>
                 ) : (
@@ -833,13 +903,13 @@ function FertilizersPage() {
                             >
                               <span>
                                 <strong>{preset.name}</strong>
-                                <small>{preset.manufacturer} · {preset.shortDescription}</small>
+                                <small>{preset.manufacturer} · {getFertilizerCopy(preset, language).shortDescription}</small>
                               </span>
                             </button>
                             <button
                               className={`fertilizer-library__plus ${isAdded ? 'fertilizer-library__plus--added' : ''}`}
                               type="button"
-                              aria-label={isAdded ? `${preset.name} уже добавлено` : `Добавить ${preset.name}`}
+                              aria-label={isAdded ? l(`${preset.name} уже добавлено`, `${preset.name} already added`) : l(`Добавить ${preset.name}`, `Add ${preset.name}`)}
                               aria-pressed={isAdded}
                               disabled={isAdded}
                               onClick={(event) => {
@@ -853,7 +923,7 @@ function FertilizersPage() {
                         )
                       })
                     ) : (
-                      <p className="fertilizer-library__empty">У этого производителя все шаблоны уже добавлены.</p>
+                      <p className="fertilizer-library__empty">{l('У этого производителя все шаблоны уже добавлены.', 'All available items from this manufacturer have already been added.')}</p>
                     )}
                   </div>
                 )}
@@ -868,7 +938,7 @@ function FertilizersPage() {
                     }
                   }}
                 >
-                  Назад
+                  {l('Назад', 'Back')}
                 </button>
             </section>
           </section>
@@ -892,22 +962,23 @@ function FertilizersPage() {
           >
             <div className="fertilizer-tools__bar">
               <div>
-                <p className="fertilizer-tools__eyebrow">Предупреждение</p>
-                <h2 id="base-line-warning-title">Заменить базовую линейку?</h2>
+                <p className="fertilizer-tools__eyebrow">{l('Предупреждение', 'Warning')}</p>
+                <h2 id="base-line-warning-title">{l('Заменить базовую линейку?', 'Replace the base nutrient line?')}</h2>
               </div>
               <button
                 className="fertilizer-tools__close"
                 type="button"
                 onClick={() => setBaseLineReplacement(null)}
-                aria-label="Закрыть"
+                aria-label={l('Закрыть', 'Close')}
               >
                 ×
               </button>
             </div>
             <p id="base-line-warning-copy">
-              Сейчас выбрана база {baseLineReplacement.currentName}. Если добавить{' '}
-              {baseLineReplacement.preset.manufacturer} · {baseLineReplacement.preset.name}, текущая базовая линейка будет удалена
-              {baseLineReplacement.currentCount > 1 ? ` (${baseLineReplacement.currentCount} поз.)` : ''}.
+              {l(
+                `Сейчас выбрана база ${baseLineReplacement.currentName}. Если добавить ${baseLineReplacement.preset.manufacturer} · ${baseLineReplacement.preset.name}, текущая базовая линейка будет удалена${baseLineReplacement.currentCount > 1 ? ` (${baseLineReplacement.currentCount} поз.)` : ''}.`,
+                `${baseLineReplacement.currentName} is currently selected. Adding ${baseLineReplacement.preset.manufacturer} · ${baseLineReplacement.preset.name} will remove the current base line${baseLineReplacement.currentCount > 1 ? ` (${baseLineReplacement.currentCount} items)` : ''}.`,
+              )}
             </p>
             <div className="fertilizer-line-warning__actions">
               <button
@@ -915,14 +986,14 @@ function FertilizersPage() {
                 type="button"
                 onClick={() => setBaseLineReplacement(null)}
               >
-                Отмена
+                {l('Отмена', 'Cancel')}
               </button>
               <button
                 className="fertilizer-line-warning__confirm"
                 type="button"
                 onClick={confirmBaseLineReplacement}
               >
-                Заменить линейку
+                {l('Заменить линейку', 'Replace line')}
               </button>
             </div>
           </section>
@@ -936,13 +1007,13 @@ function FertilizersPage() {
             className="fertilizer-details-modal"
             role="dialog"
             aria-modal="true"
-            aria-label={`Описание удобрения ${selectedLibraryPreset.name}`}
+            aria-label={l(`Описание удобрения ${selectedLibraryPreset.name}`, `${selectedLibraryPreset.name} nutrient details`)}
             tabIndex={-1}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="fertilizer-tools__bar">
               <div>
-                <p className="fertilizer-tools__eyebrow">Из базы</p>
+                <p className="fertilizer-tools__eyebrow">{l('Из базы', 'From library')}</p>
                 <h2>{selectedLibraryPreset.name}</h2>
                 <p className="fertilizer-details-modal__meta">
                   {selectedLibraryPreset.manufacturer}
@@ -952,28 +1023,28 @@ function FertilizersPage() {
                 className="fertilizer-tools__close"
                 type="button"
                 onClick={closeLibraryDetails}
-                aria-label="Закрыть"
+                aria-label={l('Закрыть', 'Close')}
               >
                 ×
               </button>
             </div>
 
             <div className="fertilizer-card__details">
-              <p>{selectedLibraryPreset.description}</p>
-              <div className="fertilizer-card__chips" aria-label="Поля описания">
-                {selectedLibraryPreset.details.map((detail) => (
+              <p>{getFertilizerCopy(selectedLibraryPreset, language).description}</p>
+              <div className="fertilizer-card__chips" aria-label={l('Поля описания', 'Product details')}>
+                {getFertilizerCopy(selectedLibraryPreset, language).details.map((detail) => (
                   <span className="fertilizer-card__chip" key={detail}>
                     {detail}
                   </span>
                 ))}
               </div>
-              <div className="fertilizer-dosage-table" aria-label="Дозировки по этапам">
+              <div className="fertilizer-dosage-table" aria-label={l('Дозировки по этапам', 'Dosage by growth stage')}>
                 <div className="fertilizer-dosage-table__row fertilizer-dosage-table__row--head">
-                  <span>Этап</span>
-                  <strong>Дозировка</strong>
+                  <span>{l('Этап', 'Stage')}</span>
+                  <strong>{l('Дозировка', 'Dosage')}</strong>
                 </div>
                 {PLANT_STAGES.map((stage) => {
-                  const display = getStageDisplay(stage, selectedLibraryPreset)
+                  const display = getStageDisplay(stage, selectedLibraryPreset, language)
 
                   return (
                     <div className="fertilizer-dosage-table__row" key={stage.id}>
@@ -994,7 +1065,7 @@ function FertilizersPage() {
                   disabled={fertilizerIds.has(selectedLibraryPreset.id)}
                   onClick={() => handleLibraryAdd(selectedLibraryPreset)}
                 >
-                  {fertilizerIds.has(selectedLibraryPreset.id) ? '✓ Добавлено' : 'Добавить'}
+                  {fertilizerIds.has(selectedLibraryPreset.id) ? l('✓ Добавлено', '✓ Added') : l('Добавить', 'Add')}
                 </button>
               </div>
             </div>
@@ -1009,13 +1080,13 @@ function FertilizersPage() {
             className="fertilizer-details-modal"
             role="dialog"
             aria-modal="true"
-            aria-label={`Карточка удобрения ${selectedFertilizer.name}`}
+            aria-label={l(`Карточка удобрения ${selectedFertilizer.name}`, `${selectedFertilizer.name} nutrient card`)}
             tabIndex={-1}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="fertilizer-tools__bar">
               <div>
-                <p className="fertilizer-tools__eyebrow">Удобрение</p>
+                <p className="fertilizer-tools__eyebrow">{l('Удобрение', 'Nutrient')}</p>
                 <h2>{selectedFertilizer.name}</h2>
                 <p className="fertilizer-details-modal__meta">
                   {selectedFertilizer.manufacturer} · {getSourceLabel()}
@@ -1025,28 +1096,28 @@ function FertilizersPage() {
                 className="fertilizer-tools__close"
                 type="button"
                 onClick={closeFertilizerDetails}
-                aria-label="Закрыть"
+                aria-label={l('Закрыть', 'Close')}
               >
                 ×
               </button>
             </div>
 
             <div className="fertilizer-card__details">
-              <p>{selectedFertilizer.description}</p>
-              <div className="fertilizer-card__chips" aria-label="Поля описания">
-                {selectedFertilizer.details.map((detail) => (
+              <p>{getFertilizerCopy(selectedFertilizer, language).description}</p>
+              <div className="fertilizer-card__chips" aria-label={l('Поля описания', 'Product details')}>
+                {getFertilizerCopy(selectedFertilizer, language).details.map((detail) => (
                   <span className="fertilizer-card__chip" key={detail}>
                     {detail}
                   </span>
                 ))}
               </div>
-              <div className="fertilizer-dosage-table" aria-label="Дозировки по этапам">
+              <div className="fertilizer-dosage-table" aria-label={l('Дозировки по этапам', 'Dosage by growth stage')}>
                 <div className="fertilizer-dosage-table__row fertilizer-dosage-table__row--head">
-                  <span>Этап</span>
-                  <strong>Дозировка</strong>
+                  <span>{l('Этап', 'Stage')}</span>
+                  <strong>{l('Дозировка', 'Dosage')}</strong>
                 </div>
                 {PLANT_STAGES.map((stage) => {
-                  const display = getStageDisplay(stage, selectedFertilizer)
+                  const display = getStageDisplay(stage, selectedFertilizer, language)
 
                   return (
                     <div className="fertilizer-dosage-table__row" key={stage.id}>
@@ -1069,7 +1140,7 @@ function FertilizersPage() {
                       openAddFlow('base')
                     }}
                   >
-                    Сменить базу
+                    {l('Сменить базу', 'Change base')}
                   </button>
                 ) : null}
                 {!isBaseDeleteConfirmOpen ? (
@@ -1078,24 +1149,24 @@ function FertilizersPage() {
                     type="button"
                     onClick={() => setIsBaseDeleteConfirmOpen(true)}
                   >
-                    {selectedFertilizer.categoryId === 'base' ? 'Удалить' : 'Удалить добавку'}
+                    {selectedFertilizer.categoryId === 'base' ? l('Удалить', 'Delete') : l('Удалить добавку', 'Delete supplement')}
                   </button>
                 ) : (
                   <div className="fertilizer-details-actions__confirm" role="alert">
                     <span>
                       {selectedFertilizer.categoryId === 'base'
-                        ? 'Удалить базу из набора?'
-                        : 'Удалить добавку из набора?'}
+                        ? l('Удалить базу из набора?', 'Remove the base nutrient from the collection?')
+                        : l('Удалить добавку из набора?', 'Remove the supplement from the collection?')}
                     </span>
                     <button type="button" onClick={() => setIsBaseDeleteConfirmOpen(false)}>
-                      Отмена
+                      {l('Отмена', 'Cancel')}
                     </button>
                     <button
                       className="fertilizer-details-actions__delete"
                       type="button"
                       onClick={() => handleDelete(selectedFertilizer.id)}
                     >
-                      Удалить
+                      {l('Удалить', 'Delete')}
                     </button>
                   </div>
                 )}
@@ -1106,17 +1177,17 @@ function FertilizersPage() {
         document.body,
       ) : null}
 
-      <section className="fertilizer-overview" aria-label="Сводка по удобрениям">
+      <section className="fertilizer-overview" aria-label={l('Сводка по удобрениям', 'Nutrient overview')}>
         <div className="fertilizer-overview__tile fertilizer-overview__tile--base">
-          <span>База</span>
+          <span>{l('База', 'Base')}</span>
           <strong>{formatBaseComponentCount(baseFertilizers[0])}</strong>
         </div>
         <div className="fertilizer-overview__tile">
-          <span>Добавки</span>
+          <span>{l('Добавки', 'Supplements')}</span>
           <strong>{additiveFertilizers.length}x</strong>
         </div>
         <div className="fertilizer-overview__tile">
-          <span>Производители</span>
+          <span>{l('Производители', 'Manufacturers')}</span>
           <strong>{manufacturerCount}x</strong>
         </div>
       </section>
@@ -1125,6 +1196,7 @@ function FertilizersPage() {
         {FERTILIZER_CATEGORIES.map((category) => {
           const categoryItems = fertilizers.filter((item) => item.categoryId === category.id)
           const categoryGroups = groupFertilizersByManufacturer(categoryItems)
+          const categoryCopy = getCategoryCopy(category.id, language) ?? category
 
           return (
           <section
@@ -1133,14 +1205,14 @@ function FertilizersPage() {
           >
             <header className="fertilizer-category__header">
               <div>
-                <h2 className="fertilizer-category__title">{category.title}</h2>
-                <p className="fertilizer-category__description">{category.description}</p>
+                <h2 className="fertilizer-category__title">{categoryCopy.title}</h2>
+                <p className="fertilizer-category__description">{categoryCopy.description}</p>
               </div>
               <span
                 className="fertilizer-category__count"
                 aria-label={category.id === 'base'
-                  ? `Схема компонентов: ${formatBaseComponentCount(categoryItems[0])}`
-                  : `${categoryItems.length} позиций`}
+                  ? l(`Схема компонентов: ${formatBaseComponentCount(categoryItems[0])}`, `Component scheme: ${formatBaseComponentCount(categoryItems[0])}`)
+                  : l(`${categoryItems.length} позиций`, `${categoryItems.length} items`)}
               >
                 {category.id === 'base'
                   ? formatBaseComponentCount(categoryItems[0])
@@ -1167,7 +1239,7 @@ function FertilizersPage() {
                     onClick={() => openAddFlow(category.id)}
                   >
                     <span className="fertilizer-card--empty__plus">+</span>
-                    <span>Добавить удобрение</span>
+                    <span>{l('Добавить удобрение', 'Add nutrient')}</span>
                   </button>
                 ) : null}
               </div>
@@ -1180,7 +1252,7 @@ function FertilizersPage() {
                   onClick={() => openAddFlow(category.id)}
                 >
                   <span className="fertilizer-card--empty__plus">+</span>
-                  <span>{category.id === 'base' ? 'Выбрать базу' : 'Добавить удобрение'}</span>
+                  <span>{category.id === 'base' ? l('Выбрать базу', 'Choose base') : l('Добавить удобрение', 'Add nutrient')}</span>
                 </button>
               </div>
             )}
@@ -1193,6 +1265,8 @@ function FertilizersPage() {
 }
 
 function RecipePage({ params, updateParam }: PersistentParams) {
+  const { language } = useAppPreferences()
+  const l = (ru: string, en: string) => language === 'ru' ? ru : en
   const [openRecipePicker, setOpenRecipePicker] = useState<'method' | 'stage' | null>(null)
 
   useModalAccessibility(
@@ -1207,7 +1281,9 @@ function RecipePage({ params, updateParam }: PersistentParams) {
   const plantStageId = params.recipePlantStageId
   const selectedMethod = GROW_METHODS.find((method) => method.id === growMethodId)
   const selectedStage = PLANT_STAGES.find((stage) => stage.id === plantStageId)
-  const pickerTitle = openRecipePicker === 'method' ? 'Метод выращивания' : 'Стадия растения'
+  const pickerTitle = openRecipePicker === 'method'
+    ? l('Метод выращивания', 'Growing method')
+    : l('Стадия растения', 'Plant stage')
   const recipeRows = fertilizers
     .flatMap<RecipeRow>((fertilizer) => {
       if (fertilizer.growMethodId !== 'any' && fertilizer.growMethodId !== growMethodId) return []
@@ -1256,7 +1332,7 @@ function RecipePage({ params, updateParam }: PersistentParams) {
       && !fertilizer.excludedGrowMethodIds?.includes(growMethodId),
   )
   const stageLabelSource = baseRecipeSource ?? targetBaseFertilizers.find((fertilizer) => fertilizer.stageLabels)
-  const selectedStageDisplay = selectedStage ? getStageDisplay(selectedStage, stageLabelSource) : null
+  const selectedStageDisplay = selectedStage ? getStageDisplay(selectedStage, stageLabelSource, language) : null
   const solutionTarget = targetBaseFertilizers
     .map((fertilizer) => fertilizer.solutionTargets?.find((target) => target.stageId === plantStageId))
     .find((target) => target && (target.phRange || target.ecRange))
@@ -1265,27 +1341,27 @@ function RecipePage({ params, updateParam }: PersistentParams) {
   const foliarAdditiveGroups = groupRecipeRowsByManufacturer(foliarAdditiveRows)
 
   return (
-    <section className="recipe-page" aria-label="Мой рецепт">
+    <section className="recipe-page" aria-label={l('Мой рецепт', 'My recipe')}>
       {openRecipePicker ? createPortal(
         <div className="recipe-picker-overlay" role="presentation" onClick={() => setOpenRecipePicker(null)}>
           <section
             className="recipe-picker"
             role="dialog"
             aria-modal="true"
-            aria-label={`Выбор: ${pickerTitle}`}
+            aria-label={l(`Выбор: ${pickerTitle}`, `Choose: ${pickerTitle}`)}
             tabIndex={-1}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="recipe-picker__bar">
               <div>
-                <p className="recipe-picker__eyebrow">Настройка рецепта</p>
+                <p className="recipe-picker__eyebrow">{l('Настройка рецепта', 'Recipe setup')}</p>
                 <h2>{pickerTitle}</h2>
               </div>
               <button
                 className="recipe-picker__close"
                 type="button"
                 onClick={() => setOpenRecipePicker(null)}
-                aria-label="Закрыть"
+                aria-label={l('Закрыть', 'Close')}
               >
                 ×
               </button>
@@ -1305,11 +1381,11 @@ function RecipePage({ params, updateParam }: PersistentParams) {
                       setOpenRecipePicker(null)
                     }}
                   >
-                    <span>{method.title}</span>
-                    {growMethodId === method.id ? <strong>Выбрано</strong> : null}
+                    <span>{language === 'ru' ? method.title : METHOD_EN[method.id]}</span>
+                    {growMethodId === method.id ? <strong>{l('Выбрано', 'Selected')}</strong> : null}
                   </button>
                 )) : PLANT_STAGES.map((stage) => {
-                  const display = getStageDisplay(stage, stageLabelSource)
+                  const display = getStageDisplay(stage, stageLabelSource, language)
 
                   return (
                     <button
@@ -1329,7 +1405,7 @@ function RecipePage({ params, updateParam }: PersistentParams) {
                         ) : null}
                         <small>{display.description}</small>
                       </span>
-                      {plantStageId === stage.id ? <strong>Выбрано</strong> : null}
+                      {plantStageId === stage.id ? <strong>{l('Выбрано', 'Selected')}</strong> : null}
                     </button>
                   )
                 })}
@@ -1343,8 +1419,8 @@ function RecipePage({ params, updateParam }: PersistentParams) {
       <ControlsGrid>
         <ControlCard
           className="recipe-card recipe-card--method"
-          title="Метод выращивания"
-          description="Среда для рецепта"
+          title={l('Метод выращивания', 'Growing method')}
+          description={l('Среда для рецепта', 'Growing medium for the recipe')}
         >
           <button
             className="recipe-choice-button recipe-choice-button--single"
@@ -1352,7 +1428,7 @@ function RecipePage({ params, updateParam }: PersistentParams) {
             aria-haspopup="dialog"
             onClick={() => setOpenRecipePicker('method')}
           >
-            <span className="recipe-choice-button__value">{selectedMethod?.title}</span>
+            <span className="recipe-choice-button__value">{selectedMethod ? (language === 'ru' ? selectedMethod.title : METHOD_EN[selectedMethod.id]) : null}</span>
             <span className="recipe-choice-button__chevron" aria-hidden="true">
               ›
             </span>
@@ -1361,8 +1437,8 @@ function RecipePage({ params, updateParam }: PersistentParams) {
 
         <ControlCard
           className="recipe-card recipe-card--stage"
-          title="Стадия растения"
-          description="Фаза цикла"
+          title={l('Стадия растения', 'Plant stage')}
+          description={l('Фаза цикла', 'Current growth phase')}
         >
           <button
             className="recipe-choice-button recipe-choice-button--single"
@@ -1379,8 +1455,8 @@ function RecipePage({ params, updateParam }: PersistentParams) {
 
         <ControlCard
           className="recipe-card recipe-card--water"
-          title="Объём воды"
-          description="Сколько раствора нужно приготовить"
+          title={l('Объём воды', 'Water volume')}
+          description={l('Сколько раствора нужно приготовить', 'Amount of solution to prepare')}
         >
           <SliderInput
             showHeader={false}
@@ -1388,8 +1464,8 @@ function RecipePage({ params, updateParam }: PersistentParams) {
             min={PARAM_LIMITS.tankVolumeLiters.min}
             max={PARAM_LIMITS.tankVolumeLiters.max}
             step={1}
-            suffix="л"
-            helper="Общий объём воды для рецепта"
+            suffix={l('л', 'L')}
+            helper={l('Общий объём воды для рецепта', 'Total water volume for the recipe')}
             onChange={(value) => updateParam('tankVolumeLiters', value)}
           />
         </ControlCard>
@@ -1398,8 +1474,8 @@ function RecipePage({ params, updateParam }: PersistentParams) {
       <section className="recipe-result" aria-labelledby="recipe-result-title">
         <div className="recipe-result__header">
           <div>
-            <p className="recipe-result__eyebrow">Рецепт</p>
-            <h2 id="recipe-result-title">Результаты расчета</h2>
+            <p className="recipe-result__eyebrow">{l('Рецепт', 'Recipe')}</p>
+            <h2 id="recipe-result-title">{l('Результаты расчета', 'Calculation results')}</h2>
           </div>
         </div>
 
@@ -1412,11 +1488,11 @@ function RecipePage({ params, updateParam }: PersistentParams) {
             <span>EC</span>
             <strong className={!solutionTarget?.ecRange && solutionTarget?.phRange ? 'recipe-result__target-note' : undefined}>
               {solutionTarget?.ecRange
-                ?? (solutionTarget?.phRange ? 'Приоритет отдан дозировке удобрения' : '—')}
+                ?? (solutionTarget?.phRange ? l('Приоритет отдан дозировке удобрения', 'Nutrient dosage takes priority') : '—')}
             </strong>
           </div>
           <div className="recipe-result__tile">
-            <span>База</span>
+            <span>{l('База', 'Base')}</span>
             {summaryBaseFertilizers.length > 0 ? (
               <div className="recipe-result__base-list">
                 {summaryBaseFertilizers.map((fertilizer) => (
@@ -1431,22 +1507,25 @@ function RecipePage({ params, updateParam }: PersistentParams) {
             )}
           </div>
           <div className="recipe-result__tile">
-            <span>Добавки</span>
+            <span>{l('Добавки', 'Supplements')}</span>
             <strong>{rootAdditiveRows.length + foliarAdditiveRows.length}x</strong>
           </div>
         </div>
 
         <p className="recipe-result__disclaimer">
-          Расчёт носит справочный характер. Сверяйте дозировки с актуальной инструкцией производителя и учитывайте качество воды, субстрат и состояние растений.
+          {l(
+            'Расчёт носит справочный характер. Сверяйте дозировки с актуальной инструкцией производителя и учитывайте качество воды, субстрат и состояние растений.',
+            'This calculation is for reference only. Check the current manufacturer instructions and account for water quality, growing medium and plant condition.',
+          )}
         </p>
 
         <div className="recipe-result__tables">
           <section className="recipe-table" aria-labelledby="recipe-base-title">
-            <h3 id="recipe-base-title">База</h3>
+            <h3 id="recipe-base-title">{l('База', 'Base nutrients')}</h3>
             <div className="recipe-table__head">
-              <span>Удобрение</span>
-              <span>На 1л</span>
-              <span>На {waterVolumeLiters}л</span>
+              <span>{l('Удобрение', 'Nutrient')}</span>
+              <span>{l('На 1л', 'Per 1 L')}</span>
+              <span>{l(`На ${waterVolumeLiters}л`, `Per ${waterVolumeLiters} L`)}</span>
             </div>
             {baseRecipeGroups.length > 0 ? (
               baseRecipeGroups.map((group) => (
@@ -1455,23 +1534,23 @@ function RecipePage({ params, updateParam }: PersistentParams) {
                   {group.items.map((row) => (
                     <div className="recipe-table__row" key={`${row.fertilizer.id}-${row.component?.id ?? 'main'}`}>
                       <strong>{getRecipeRowName(row)}</strong>
-                      <span>{formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component)}</span>
-                      <span>{formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component)}</span>
+                      <span>{localizeDosageText(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
+                      <span>{localizeDosageText(formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component), language)}</span>
                     </div>
                   ))}
                 </div>
               ))
             ) : (
-              <p className="recipe-table__empty">Нет базового удобрения для выбранных параметров.</p>
+              <p className="recipe-table__empty">{l('Нет базового удобрения для выбранных параметров.', 'No base nutrient matches the selected parameters.')}</p>
             )}
           </section>
 
           <section className="recipe-table" aria-labelledby="recipe-root-title">
-            <h3 id="recipe-root-title">Добавки под корень</h3>
+            <h3 id="recipe-root-title">{l('Добавки под корень', 'Root supplements')}</h3>
             <div className="recipe-table__head">
-              <span>Добавка</span>
-              <span>На 1л</span>
-              <span>На {waterVolumeLiters}л</span>
+              <span>{l('Добавка', 'Supplement')}</span>
+              <span>{l('На 1л', 'Per 1 L')}</span>
+              <span>{l(`На ${waterVolumeLiters}л`, `Per ${waterVolumeLiters} L`)}</span>
             </div>
             {rootAdditiveGroups.length > 0 ? (
               rootAdditiveGroups.map((group) => (
@@ -1480,23 +1559,23 @@ function RecipePage({ params, updateParam }: PersistentParams) {
                   {group.items.map((row) => (
                     <div className="recipe-table__row" key={`${row.fertilizer.id}-${row.component?.id ?? 'main'}`}>
                       <strong>{getRecipeRowName(row)}</strong>
-                      <span>{formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component)}</span>
-                      <span>{formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component)}</span>
+                      <span>{localizeDosageText(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
+                      <span>{localizeDosageText(formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component), language)}</span>
                     </div>
                   ))}
                 </div>
               ))
             ) : (
-              <p className="recipe-table__empty">Нет добавок под корень для выбранной стадии.</p>
+              <p className="recipe-table__empty">{l('Нет добавок под корень для выбранной стадии.', 'No root supplements match the selected stage.')}</p>
             )}
           </section>
 
           <section className="recipe-table" aria-labelledby="recipe-foliar-title">
-            <h3 id="recipe-foliar-title">По листу</h3>
+            <h3 id="recipe-foliar-title">{l('По листу', 'Foliar application')}</h3>
             <div className="recipe-table__head recipe-table__head--foliar">
-              <span>Добавка</span>
-              <span>Капли</span>
-              <span>На 1л</span>
+              <span>{l('Добавка', 'Supplement')}</span>
+              <span>{l('Капли', 'Drops')}</span>
+              <span>{l('На 1л', 'Per 1 L')}</span>
             </div>
             {foliarAdditiveGroups.length > 0 ? (
               foliarAdditiveGroups.map((group) => (
@@ -1505,14 +1584,14 @@ function RecipePage({ params, updateParam }: PersistentParams) {
                   {group.items.map((row) => (
                     <div className="recipe-table__row recipe-table__row--foliar" key={`${row.fertilizer.id}-${row.component?.id ?? 'main'}`}>
                       <strong>{getRecipeRowName(row)}</strong>
-                      <span>{formatRecipeFoliarDose(row.fertilizer.foliarDose)}</span>
-                      <span>{formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component)}</span>
+                      <span>{localizeDosageText(formatRecipeFoliarDose(row.fertilizer.foliarDose), language)}</span>
+                      <span>{localizeDosageText(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
                     </div>
                   ))}
                 </div>
               ))
             ) : (
-              <p className="recipe-table__empty">Нет листовых добавок для выбранной стадии.</p>
+              <p className="recipe-table__empty">{l('Нет листовых добавок для выбранной стадии.', 'No foliar supplements match the selected stage.')}</p>
             )}
           </section>
         </div>

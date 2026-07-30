@@ -79,7 +79,8 @@ export function downloadCalendarFile(
     String(date.getMonth() + 1).padStart(2, '0'),
     String(date.getDate()).padStart(2, '0'),
   ].join('-')
-  link.download = `напоминание-${localDate}.ics`
+  const filenamePrefix = document.documentElement.lang === 'en' ? 'reminder' : 'напоминание'
+  link.download = `${filenamePrefix}-${localDate}.ics`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)

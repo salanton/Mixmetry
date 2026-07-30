@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react'
+import { useAppPreferences } from '../contexts/AppPreferencesContext'
 
 type Props = {
   label?: string
@@ -11,6 +12,7 @@ type Props = {
 }
 
 const StepperInput = ({ label, value, min, max, step = 1, suffix, onChange }: Props) => {
+  const { language } = useAppPreferences()
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     const next = Number(event.target.value)
     if (!Number.isNaN(next)) {
@@ -29,7 +31,7 @@ const StepperInput = ({ label, value, min, max, step = 1, suffix, onChange }: Pr
       <div className="stepper__controls">
         <button
           type="button"
-          aria-label="Уменьшить"
+          aria-label={language === 'ru' ? 'Уменьшить' : 'Decrease'}
           className="stepper__btn"
           onClick={() => adjust(-step)}
           disabled={value <= min}
@@ -50,7 +52,7 @@ const StepperInput = ({ label, value, min, max, step = 1, suffix, onChange }: Pr
         </div>
         <button
           type="button"
-          aria-label="Увеличить"
+          aria-label={language === 'ru' ? 'Увеличить' : 'Increase'}
           className="stepper__btn"
           onClick={() => adjust(step)}
           disabled={value >= max}

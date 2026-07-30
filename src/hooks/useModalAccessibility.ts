@@ -46,7 +46,7 @@ export const useModalAccessibility = (
       inertElements.push(topbar)
     }
 
-    const focusTarget = dialog.querySelector<HTMLElement>('[aria-label="Закрыть"], button, [href], input, select, textarea')
+    const focusTarget = dialog.querySelector<HTMLElement>('[aria-label="Закрыть"], [aria-label="Close"], button, [href], input, select, textarea')
     const frame = window.requestAnimationFrame(() => (focusTarget ?? dialog).focus())
 
     const handleKeyDown = (event: KeyboardEvent) => {
