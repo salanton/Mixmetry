@@ -44,7 +44,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: End-to-end tests
-        run: npm run test:e2e
+        run: npm run test:e2e:functional
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -54,12 +54,33 @@ jobs:
         with:
           path: './dist'
 
+  visual:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install chromium
+
+      - name: Visual regression tests
+        run: npm run test:e2e:visual
+
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, visual]
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

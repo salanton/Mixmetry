@@ -10,6 +10,8 @@
     "test": "vitest run src",
     "check": "npm run lint && npm test && npm run build",
     "test:e2e": "playwright test",
+    "test:e2e:functional": "playwright test --grep-invert @visual",
+    "test:e2e:visual": "playwright test tests/e2e/visual.spec.ts --project mobile-chromium",
     "preview": "vite preview"
   },
   "dependencies": {

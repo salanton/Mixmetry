@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('./')
 })
 
-test('matches the key mobile application states', async ({ page }, testInfo) => {
+test('@visual matches the key mobile application states', async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith('mobile'), 'Mobile-only visual baseline')
 
   await expect(page).toHaveScreenshot('watering-light.png', screenshotOptions)
