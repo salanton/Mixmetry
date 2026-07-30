@@ -97,6 +97,16 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
     const detailsContent = baseDetails.locator('.fertilizer-card__details')
     await detailsContent.evaluate((content) => { content.scrollTop = content.scrollHeight })
     await expect.poll(() => detailsContent.evaluate((content) => content.scrollTop)).toBeGreaterThan(0)
+    const bottomClearance = await baseDetails.evaluate((modal) => {
+      const content = modal.querySelector('.fertilizer-card__details')
+      const actions = modal.querySelector('.fertilizer-details-actions')
+      const rows = content?.querySelectorAll('.fertilizer-dosage-table__row')
+      const lastRow = rows?.item((rows?.length ?? 1) - 1)
+      if (!content || !actions || !lastRow) return Number.NEGATIVE_INFINITY
+      return Math.min(content.getBoundingClientRect().bottom, actions.getBoundingClientRect().top)
+        - lastRow.getBoundingClientRect().bottom
+    })
+    expect(bottomClearance).toBeGreaterThanOrEqual(16)
   }
   await baseDetails.getByRole('button', { name: 'Сменить базу' }).click()
   dialog = page.getByRole('dialog', { name: 'Добавление удобрений' })

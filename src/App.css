@@ -3736,7 +3736,8 @@ body {
     margin-top: 0;
     overflow-x: visible;
     overflow-y: auto;
-    padding-bottom: 1rem;
+    padding-bottom: 1.25rem;
+    scroll-padding-bottom: 1.25rem;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
