@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type TouchEvent as ReactTouch
 import { createPortal } from 'react-dom'
 import AppShell from './components/AppShell'
 import AppSettings from './components/AppSettings'
+import BaseLineReplacementDialog, { type BaseLineReplacement } from './components/BaseLineReplacementDialog'
 import ControlCard from './components/ControlCard'
 import ControlsGrid from './components/ControlsGrid'
 import FertilizerDetailsModal from './components/FertilizerDetailsModal'
@@ -38,11 +39,6 @@ const SWIPE_BLOCK_SELECTOR = [
   '.app-settings-overlay',
   '[data-horizontal-scroll]',
 ].join(',')
-type BaseLineReplacement = {
-  preset: FertilizerItem
-  currentName: string
-  currentCount: number
-}
 type RecipeRow = {
   fertilizer: FertilizerItem
   component?: FertilizerComponent
@@ -424,57 +420,12 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
       ) : null}
 
       {baseLineReplacement ? createPortal(
-        <div
-          className="fertilizer-tools-overlay fertilizer-tools-overlay--stacked fertilizer-tools-overlay--warning"
-          role="presentation"
-          onClick={() => setBaseLineReplacement(null)}
-        >
-          <section
-            className="fertilizer-line-warning"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="base-line-warning-title"
-            aria-describedby="base-line-warning-copy"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="fertilizer-tools__bar">
-              <div>
-                <p className="fertilizer-tools__eyebrow">{l('Предупреждение', 'Warning')}</p>
-                <h2 id="base-line-warning-title">{l('Заменить базовую линейку?', 'Replace the base nutrient line?')}</h2>
-              </div>
-              <button
-                className="fertilizer-tools__close"
-                type="button"
-                onClick={() => setBaseLineReplacement(null)}
-                aria-label={l('Закрыть', 'Close')}
-              >
-                ×
-              </button>
-            </div>
-            <p id="base-line-warning-copy">
-              {l(
-                `Сейчас выбрана база ${baseLineReplacement.currentName}. Если добавить ${baseLineReplacement.preset.manufacturer} · ${baseLineReplacement.preset.name}, текущая базовая линейка будет удалена${baseLineReplacement.currentCount > 1 ? ` (${baseLineReplacement.currentCount} поз.)` : ''}.`,
-                `${baseLineReplacement.currentName} is currently selected. Adding ${baseLineReplacement.preset.manufacturer} · ${baseLineReplacement.preset.name} will remove the current base line${baseLineReplacement.currentCount > 1 ? ` (${baseLineReplacement.currentCount} items)` : ''}.`,
-              )}
-            </p>
-            <div className="fertilizer-line-warning__actions">
-              <button
-                className="fertilizer-line-warning__cancel"
-                type="button"
-                onClick={() => setBaseLineReplacement(null)}
-              >
-                {l('Отмена', 'Cancel')}
-              </button>
-              <button
-                className="fertilizer-line-warning__confirm"
-                type="button"
-                onClick={confirmBaseLineReplacement}
-              >
-                {l('Заменить линейку', 'Replace line')}
-              </button>
-            </div>
-          </section>
-        </div>,
+        <BaseLineReplacementDialog
+          replacement={baseLineReplacement}
+          language={language}
+          onCancel={() => setBaseLineReplacement(null)}
+          onConfirm={confirmBaseLineReplacement}
+        />,
         document.body,
       ) : null}
 
