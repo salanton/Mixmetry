@@ -218,7 +218,9 @@
   .swipe-viewport {
     flex: 1 1 auto;
     min-height: 0;
+    width: calc(100% + (var(--swipe-panel-edge-space) * 2));
     height: auto !important;
+    margin-inline: calc(var(--swipe-panel-edge-space) * -1);
     overflow: hidden;
     transition: none !important;
   }
@@ -236,7 +238,10 @@
     overflow-y: auto;
     overscroll-behavior-y: contain;
     padding-top: calc(5.15rem + env(safe-area-inset-top));
-    padding-bottom: calc(3.6rem + var(--mobile-safe-bottom));
+    padding-right: var(--swipe-panel-edge-space);
+    padding-bottom: calc(var(--mobile-nav-content-clearance) + var(--mobile-safe-bottom));
+    padding-left: var(--swipe-panel-edge-space);
+    scroll-padding-bottom: calc(var(--mobile-nav-content-clearance) + var(--mobile-safe-bottom));
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }

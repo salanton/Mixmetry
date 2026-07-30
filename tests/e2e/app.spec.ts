@@ -308,6 +308,8 @@ test('keeps the mobile navigation fixed and content within the viewport', async 
       capsuleIsVisible: tabsStyle.backgroundColor !== 'rgba(0, 0, 0, 0)' && tabsStyle.borderBottomLeftRadius !== '0px',
       canvasHasNoSafeAreaPadding: shellStyle.paddingTop === '0px' && shellStyle.paddingBottom === '0px',
       contentKeepsSafeSpacing: Number.parseFloat(panelStyle.paddingTop) > 70 && Number.parseFloat(panelStyle.paddingBottom) > 50,
+      contentClearsNavigation: Number.parseFloat(panelStyle.paddingBottom) > tabs.height + 12,
+      contentHasEdgeSpace: Number.parseFloat(panelStyle.paddingLeft) >= 2 && Number.parseFloat(panelStyle.paddingRight) >= 2,
       hasHorizontalOverflow: document.body.scrollWidth > window.innerWidth,
     }
   })
@@ -317,17 +319,23 @@ test('keeps the mobile navigation fixed and content within the viewport', async 
   expect(geometry.capsuleIsVisible).toBe(true)
   expect(geometry.canvasHasNoSafeAreaPadding).toBe(true)
   expect(geometry.contentKeepsSafeSpacing).toBe(true)
+  expect(geometry.contentClearsNavigation).toBe(true)
+  expect(geometry.contentHasEdgeSpace).toBe(true)
   expect(geometry.hasHorizontalOverflow).toBe(false)
 })
 
-test('hides the mobile header before it can enter the status area', async ({ page }, testInfo) => {
+test('keeps settings available and turns the mobile brand into a back-to-top action', async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith('mobile'), 'Mobile-only header assertion')
 
   const panel = page.locator('.swipe-panel').first()
-  const heading = page.locator('.topbar__heading')
+  const brand = page.locator('.topbar__brand')
+  const settings = page.getByRole('button', { name: 'Открыть настройки' })
   await panel.evaluate((element) => { element.scrollTop = 70 })
-  await expect(heading).toHaveCSS('opacity', '0')
-  await expect(page.locator('.topbar')).toHaveCSS('pointer-events', 'none')
+  await expect(brand).toBeEnabled()
+  await expect(brand).toHaveAttribute('aria-label', 'Вернуться наверх')
+  await expect(settings).toBeVisible()
+  await brand.click()
+  await expect.poll(() => panel.evaluate((element) => element.scrollTop)).toBe(0)
 })
 
 test('shows the install hint only in a mobile browser, not in an installed PWA', async ({ page }, testInfo) => {

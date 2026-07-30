@@ -1,5 +1,7 @@
 :root {
   --mobile-safe-bottom: min(env(safe-area-inset-bottom), 1rem);
+  --mobile-nav-content-clearance: 4.6rem;
+  --swipe-panel-edge-space: 2px;
   --ivory: #f4f7f6;
   --app-bg: var(--ivory);
   --surface: #ffffff;

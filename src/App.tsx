@@ -30,6 +30,8 @@ const PAGE_ORDER: PageId[] = ['calculator', 'fertilizers', 'recipe']
 const SWIPE_THRESHOLD = 48
 const SWIPE_FLICK_THRESHOLD = 28
 const SWIPE_FLICK_DURATION = 300
+const SWIPE_TRANSITION_MS = 380
+const SWIPE_TRANSITION_EASING = 'cubic-bezier(0.22, 0.92, 0.3, 1)'
 const MOBILE_SWIPE_QUERY = '(max-width: 639px)'
 const SWIPE_BLOCK_SELECTOR = [
   'button',
@@ -90,7 +92,7 @@ function App() {
     const viewport = swipeViewportRef.current
     if (!track || !viewport) return
     track.style.transition = animate
-      ? 'transform 380ms cubic-bezier(0.22, 0.92, 0.3, 1)'
+      ? `transform ${SWIPE_TRANSITION_MS}ms ${SWIPE_TRANSITION_EASING}`
       : 'none'
     const panel = track.children.item(pageIndex)
     if (!(panel instanceof HTMLElement)) return
@@ -102,7 +104,7 @@ function App() {
     const viewport = swipeViewportRef.current
     if (!viewport || isMobileSwipeLayout()) return
     viewport.style.transition = animate
-      ? 'height 380ms cubic-bezier(0.22, 0.92, 0.3, 1)'
+      ? `height ${SWIPE_TRANSITION_MS}ms ${SWIPE_TRANSITION_EASING}`
       : 'none'
     viewport.style.height = `${height}px`
   }, [])
@@ -120,7 +122,7 @@ function App() {
     if (currentHeight) resizeSwipeViewport(currentHeight, true)
     swipeTransitionTimeout.current = window.setTimeout(() => {
       isSwipeTransitioning.current = false
-    }, 380)
+    }, SWIPE_TRANSITION_MS)
   }
 
   useEffect(() => {
@@ -266,7 +268,7 @@ function App() {
       if (!isMobileSwipeLayout()) window.scrollTo({ top: 0, behavior: 'auto' })
       setActivePage(nextPage)
       isSwipeTransitioning.current = false
-    }, prefersReducedMotion ? 0 : 380)
+    }, prefersReducedMotion ? 0 : SWIPE_TRANSITION_MS)
   }
 
   return (
