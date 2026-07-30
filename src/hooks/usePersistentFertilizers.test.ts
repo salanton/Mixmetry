@@ -3,6 +3,10 @@ import { DEFAULT_FERTILIZERS } from '../data/fertilizerLibrary'
 import { sanitizeFertilizers } from './usePersistentFertilizers'
 
 describe('sanitizeFertilizers', () => {
+  it('preserves an intentionally empty collection', () => {
+    expect(sanitizeFertilizers([])).toEqual([])
+  })
+
   it('falls back to defaults for malformed storage data', () => {
     expect(sanitizeFertilizers({ id: 'invalid' })).toEqual(DEFAULT_FERTILIZERS)
   })

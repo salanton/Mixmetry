@@ -6,16 +6,16 @@ const pwa = VitePWA({
   registerType: 'autoUpdate',
   includeAssets: ['apple-touch-icon.png'],
   manifest: {
-    name: 'DripCalc — Калькулятор автополива',
-    short_name: 'DripCalc',
+    name: 'Mixmetry — Полив и питание растений',
+    short_name: 'Mixmetry',
     description: 'Расчёт расписания автополива и рецептов питательного раствора',
     lang: 'ru',
     id: '.',
     start_url: '.',
     scope: '.',
     display: 'standalone',
-    background_color: '#f5f6f9',
-    theme_color: '#f5f6f9',
+    background_color: '#f4f7f6',
+    theme_color: '#f4f7f6',
     icons: [
       {
         src: 'icons/icon-192.png',
@@ -32,7 +32,10 @@ const pwa = VitePWA({
     ]
   },
   workbox: {
-    globPatterns: ['**/*.{js,css,html}'],
+    globPatterns: ['**/*.{js,css,html,svg,png}'],
+    cleanupOutdatedCaches: true,
+    clientsClaim: true,
+    skipWaiting: true,
     runtimeCaching: [
       {
         urlPattern: ({ request }) => request.destination === 'document',
@@ -40,15 +43,6 @@ const pwa = VitePWA({
         options: {
           cacheName: 'pages',
           expiration: { maxEntries: 10 }
-        }
-      },
-      {
-        urlPattern: ({ request }) =>
-          ['style', 'script', 'image', 'font'].includes(request.destination),
-        handler: 'CacheFirst',
-        options: {
-          cacheName: 'assets',
-          expiration: { maxEntries: 50 }
         }
       }
     ]

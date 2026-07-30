@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent as ReactTouchEvent, type UIEvent as ReactUIEvent } from 'react'
+import { createPortal } from 'react-dom'
 import AppShell from './components/AppShell'
+import AppSettings from './components/AppSettings'
 import ControlCard from './components/ControlCard'
 import ControlsGrid from './components/ControlsGrid'
 import InstallHint from './components/InstallHint'
@@ -19,10 +21,29 @@ import {
   timeStringToMinutes,
 } from './utils/calculations'
 import { downloadCalendarFile } from './utils/reminders'
-import dripCalcMark from './assets/dripcalc-mark.svg'
+import mixmetryMark from './assets/mixmetry-mark.svg'
+import { useAppPreferences } from './contexts/AppPreferencesContext'
 import './App.css'
 
 type PageId = 'calculator' | 'recipe' | 'fertilizers'
+const PAGE_ORDER: PageId[] = ['calculator', 'fertilizers', 'recipe']
+const SWIPE_THRESHOLD = 48
+const SWIPE_FLICK_THRESHOLD = 28
+const SWIPE_FLICK_DURATION = 300
+const MOBILE_SWIPE_QUERY = '(max-width: 639px)'
+const MOBILE_HEADER_TRAVEL = 12
+const SWIPE_BLOCK_SELECTOR = [
+  'button',
+  'a',
+  'input',
+  'select',
+  'textarea',
+  '[role="slider"]',
+  '[role="dialog"]',
+  '.fertilizer-tools-overlay',
+  '.app-settings-overlay',
+  '[data-horizontal-scroll]',
+].join(',')
 type BaseLineReplacement = {
   preset: FertilizerItem
   currentName: string
@@ -35,12 +56,6 @@ type RecipeRow = {
   amountTotal: number
 }
 type PersistentParams = ReturnType<typeof usePersistentParams>
-
-const PAGE_TITLES: Record<PageId, string> = {
-  calculator: 'Калькулятор автополива',
-  recipe: 'Мой рецепт',
-  fertilizers: 'Мои удобрения',
-}
 
 const PageIcon = ({ page }: { page: PageId }) => {
   if (page === 'calculator') {
@@ -68,6 +83,58 @@ const PageIcon = ({ page }: { page: PageId }) => {
     </svg>
   )
 }
+
+type PageNavigationProps = {
+  activePage: PageId
+  className?: string
+  labels: {
+    sections: string
+    calculator: string
+    fertilizers: string
+    fertilizersShort: string
+    recipe: string
+    recipeShort: string
+  }
+  onSelect: (page: PageId) => void
+}
+
+const PageNavigation = ({ activePage, className = '', labels, onSelect }: PageNavigationProps) => (
+  <nav className={`page-tabs ${className}`.trim()} aria-label={labels.sections}>
+    <button
+      className={`page-tabs__button page-tabs__button--calculator ${activePage === 'calculator' ? 'page-tabs__button--active' : ''}`}
+      type="button"
+      aria-label={labels.calculator}
+      aria-current={activePage === 'calculator' ? 'page' : undefined}
+      onClick={() => onSelect('calculator')}
+    >
+      <PageIcon page="calculator" />
+      <span className="page-tabs__label page-tabs__label--desktop">{labels.calculator}</span>
+      <span className="page-tabs__label page-tabs__label--mobile">{labels.calculator}</span>
+    </button>
+    <button
+      className={`page-tabs__button page-tabs__button--fertilizers ${activePage === 'fertilizers' ? 'page-tabs__button--active' : ''}`}
+      type="button"
+      aria-label={labels.fertilizers}
+      aria-current={activePage === 'fertilizers' ? 'page' : undefined}
+      onClick={() => onSelect('fertilizers')}
+    >
+      <PageIcon page="fertilizers" />
+      <span className="page-tabs__label page-tabs__label--desktop">{labels.fertilizers}</span>
+      <span className="page-tabs__label page-tabs__label--mobile">{labels.fertilizersShort}</span>
+    </button>
+    <button
+      className={`page-tabs__button page-tabs__button--recipe ${activePage === 'recipe' ? 'page-tabs__button--active' : ''}`}
+      type="button"
+      aria-label={labels.recipe}
+      aria-current={activePage === 'recipe' ? 'page' : undefined}
+      onClick={() => onSelect('recipe')}
+    >
+      <PageIcon page="recipe" />
+      <span className="page-tabs__label page-tabs__label--desktop">{labels.recipe}</span>
+      <span className="page-tabs__label page-tabs__label--mobile">{labels.recipeShort}</span>
+    </button>
+  </nav>
+)
 
 const formatMlValue = (value: number) => {
   const rounded = Number(value.toFixed(2))
@@ -237,6 +304,8 @@ const groupFertilizersByManufacturer = (items: FertilizerItem[]) => {
 }
 
 function CalculatorPage({ params, updateParam }: PersistentParams) {
+  const { language } = useAppPreferences()
+  const l = (ru: string, en: string) => language === 'ru' ? ru : en
   const volumes = useMemo(() => calcVolumes(params), [params])
   const schedule = useMemo(() => calcSchedule(params, volumes), [params, volumes])
   const maxWateringsPerDay = params.unlimitedWaterings ? PARAM_LIMITS.wateringsPerDay.max : 4
@@ -250,11 +319,13 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
   const daysUntilRefillRounded = Math.max(0, Math.round(daysUntilRefill))
   const nextRefillDate = new Date()
   nextRefillDate.setDate(nextRefillDate.getDate() + daysUntilRefillRounded)
-  const nextRefillDateLabel = nextRefillDate.toLocaleDateString('ru-RU', {
+  const nextRefillDateLabel = nextRefillDate.toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-GB', {
     day: '2-digit',
     month: '2-digit',
   })
-  const daysWord =
+  const daysWord = language === 'en'
+    ? (daysUntilRefillRounded === 1 ? 'day' : 'days')
+    :
     daysUntilRefillRounded % 10 === 1 && daysUntilRefillRounded % 100 !== 11
       ? 'день'
       : daysUntilRefillRounded % 10 >= 2 &&
@@ -271,8 +342,8 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
   }
 
   const handleCreateReminder = () => {
-    const reminderTitle = `Наполнить бак (${params.tankVolumeLiters} л)`
-    const reminderDescription = 'Следующее наполнение бака автополива'
+    const reminderTitle = l(`Наполнить бак (${params.tankVolumeLiters} л)`, `Refill tank (${params.tankVolumeLiters} L)`)
+    const reminderDescription = l('Следующее наполнение бака автополива', 'Next irrigation tank refill')
     downloadCalendarFile(reminderTitle, nextRefillDate, reminderDescription)
   }
 
@@ -286,8 +357,8 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
         <ControlsGrid>
           <ControlCard
             className="control-card--mode"
-            title="Световой режим растений"
-            description="Часы света и время включения"
+            title={l('Световой режим растений', 'Plant light cycle')}
+            description={l('Часы света и время включения', 'Light hours and start time')}
           >
             <SliderInput
               showHeader={false}
@@ -297,7 +368,7 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
               max={PARAM_LIMITS.lightHours.max}
               step={1}
               onChange={(v) => updateParam('lightHours', v)}
-              helper={`Свет: ${params.lightHours} ч · Тьма: ${24 - params.lightHours} ч`}
+              helper={l(`Свет: ${params.lightHours} ч · Тьма: ${24 - params.lightHours} ч`, `Light: ${params.lightHours} h · Dark: ${24 - params.lightHours} h`)}
             />
             <SliderInput
               showHeader={false}
@@ -306,15 +377,15 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
               max={23 * 60 + 45}
               step={15}
               displayValue={params.lampOnTime}
-              helper="Время включения света"
+              helper={l('Время включения света', 'Lights on time')}
               onChange={(v) => updateParam('lampOnTime', minutesToTimeString(v))}
             />
           </ControlCard>
 
           <ControlCard
             className="control-card--waterings"
-            title="Частота и количество поливов"
-            description="Количество включений и длительность"
+            title={l('Частота и количество поливов', 'Watering frequency')}
+            description={l('Количество включений и длительность', 'Number and duration of cycles')}
           >
             <SliderInput
               showHeader={false}
@@ -322,8 +393,8 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
               min={PARAM_LIMITS.durationMinutes.min}
               max={PARAM_LIMITS.durationMinutes.max}
               step={1}
-              suffix="мин"
-              helper="Минуты за раз"
+              suffix={l('мин', 'min')}
+              helper={l('Минуты за раз', 'Minutes per cycle')}
               onChange={(v) => updateParam('durationMinutes', v)}
             />
             <SliderInput
@@ -332,14 +403,14 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
               min={PARAM_LIMITS.wateringsPerDay.min}
               max={maxWateringsPerDay}
               step={1}
-              helper="Количество включений"
+              helper={l('Количество включений', 'Number of cycles')}
               onChange={(v) => updateParam('wateringsPerDay', v)}
             />
           </ControlCard>
 
           <ControlCard
-            title="Опции"
-            description="Дополнительные параметры"
+            title={l('Опции', 'Options')}
+            description={l('Дополнительные параметры', 'Additional parameters')}
           >
             <label className="toggle-row toggle-row--switch" htmlFor="correctWatering">
               <input
@@ -351,9 +422,9 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
               />
               <span className="toggle-switch__slider" aria-hidden="true" />
               <div className="toggle-row__text">
-                <div className="toggle-row__title">Правильный полив</div>
+                <div className="toggle-row__title">{l('Правильный полив', 'Light-window watering')}</div>
                 <p className="toggle-row__desc">
-                  Только в световом окне, без первых и последних {EDGE_OFFSET_MIN} мин.
+                  {l(`Только в световом окне, без первых и последних ${EDGE_OFFSET_MIN} мин.`, `Only during the light window, excluding the first and last ${EDGE_OFFSET_MIN} min.`)}
                 </p>
               </div>
             </label>
@@ -367,8 +438,8 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
               />
               <span className="toggle-switch__slider" aria-hidden="true" />
               <div className="toggle-row__text">
-                <div className="toggle-row__title">Без ограничений</div>
-                <p className="toggle-row__desc">До 100 поливов в сутки, специфичное применение</p>
+                <div className="toggle-row__title">{l('Без ограничений', 'No cycle limit')}</div>
+                <p className="toggle-row__desc">{l('До 100 поливов в сутки, специфичное применение', 'Up to 100 cycles per day for special setups')}</p>
               </div>
             </label>
             <label className="toggle-row toggle-row--switch" htmlFor="showCompensatedDripsCard">
@@ -381,9 +452,9 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
               />
               <span className="toggle-switch__slider" aria-hidden="true" />
               <div className="toggle-row__text">
-                <div className="toggle-row__title">Компенсированные капельницы</div>
+                <div className="toggle-row__title">{l('Компенсированные капельницы', 'Pressure-compensating drippers')}</div>
                 <p className="toggle-row__desc">
-                  Позволяет рассчитать расход при использовании таких капельниц
+                  {l('Позволяет рассчитать расход при использовании таких капельниц', 'Calculates flow for pressure-compensating drippers')}
                 </p>
               </div>
             </label>
@@ -397,8 +468,8 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
               />
               <span className="toggle-switch__slider" aria-hidden="true" />
               <div className="toggle-row__text">
-                <div className="toggle-row__title">Рассчитать расход</div>
-                <p className="toggle-row__desc">Позволяет рассчитать день следующего наполнения бака.</p>
+                <div className="toggle-row__title">{l('Рассчитать расход', 'Track tank supply')}</div>
+                <p className="toggle-row__desc">{l('Позволяет рассчитать день следующего наполнения бака.', 'Estimates the next tank refill date.')}</p>
               </div>
             </label>
           </ControlCard>
@@ -407,17 +478,17 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
             <ControlCard
               className="control-card--drips"
               bentoSpan="desktop-full"
-              title="Компенсированные капельницы"
-              description="Параметры системы"
+              title={l('Компенсированные капельницы', 'Pressure-compensating drippers')}
+              description={l('Параметры системы', 'System parameters')}
             >
               <SliderInput
                 showHeader={false}
-                displayValue={`${params.dripRateLph.toFixed(1)} л/ч`}
+                displayValue={l(`${params.dripRateLph.toFixed(1)} л/ч`, `${params.dripRateLph.toFixed(1)} L/h`)}
                 value={params.dripRateLph}
                 min={PARAM_LIMITS.dripRateLph.min}
                 max={PARAM_LIMITS.dripRateLph.max}
                 step={0.1}
-                helper="Расход одной капельницы"
+                helper={l('Расход одной капельницы', 'Flow per dripper')}
                 onChange={(v) => updateParam('dripRateLph', Number(v.toFixed(1)))}
               />
               <SliderInput
@@ -427,7 +498,7 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
                 max={PARAM_LIMITS.dripCount.max}
                 step={1}
                 suffix="x"
-                helper="Количество капельниц на растение"
+                helper={l('Количество капельниц на растение', 'Drippers per plant')}
                 onChange={(v) => updateParam('dripCount', v)}
               />
               <SliderInput
@@ -437,7 +508,7 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
                 max={PARAM_LIMITS.plantCount.max}
                 step={1}
                 suffix="x"
-                helper="Количество растений в системе"
+                helper={l('Количество растений в системе', 'Plants in the system')}
                 onChange={(v) => updateParam('plantCount', v)}
               />
             </ControlCard>
@@ -447,8 +518,8 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
             <ControlCard
               className="control-card--tank"
               bentoSpan="desktop-full"
-              title="Объём бака"
-              description="Расчёт до следующего наполнения"
+              title={l('Объём бака', 'Tank volume')}
+              description={l('Расчёт до следующего наполнения', 'Estimate until the next refill')}
               bodyClassName="control-card--tank__body"
             >
               <SliderInput
@@ -457,8 +528,8 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
                 min={PARAM_LIMITS.dailyConsumptionLiters.min}
                 max={PARAM_LIMITS.dailyConsumptionLiters.max}
                 step={0.1}
-                suffix="л"
-                helper="Расход литров в день"
+                suffix={l('л', 'L')}
+                helper={l('Расход литров в день', 'Daily water use')}
                 onChange={(v) => updateParam('dailyConsumptionLiters', v)}
                 disabled={params.showCompensatedDripsCard}
               />
@@ -468,22 +539,22 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
                 min={PARAM_LIMITS.tankVolumeLiters.min}
                 max={PARAM_LIMITS.tankVolumeLiters.max}
                 step={1}
-                suffix="л"
-                helper="Объём воды"
+                suffix={l('л', 'L')}
+                helper={l('Объём воды', 'Water volume')}
                 onChange={(v) => updateParam('tankVolumeLiters', v)}
               />
               <div className="tank-result" aria-live="polite">
                 <strong className="tank-result__value">
                   {daysUntilRefillRounded} {daysWord}
                 </strong>
-                <span className="tank-result__date">Запас до ≈ {nextRefillDateLabel}</span>
+                <span className="tank-result__date">{l('Запас до', 'Supply until')} ≈ {nextRefillDateLabel}</span>
                 <button
                   className="reminder-button"
                   onClick={handleCreateReminder}
-                  title="Создать напоминание"
-                  aria-label="Создать напоминание о наполнении бака"
+                  title={l('Создать напоминание', 'Create reminder')}
+                  aria-label={l('Создать напоминание о наполнении бака', 'Create a tank refill reminder')}
                 >
-                  <span className="reminder-button__text">Напомнить</span>
+                  <span className="reminder-button__text">{l('Напомнить', 'Remind me')}</span>
                 </button>
               </div>
             </ControlCard>
@@ -685,7 +756,7 @@ function FertilizersPage() {
       className="fertilizers-page"
       aria-label="Удобрения"
     >
-      {addFlowCategoryId ? (
+      {addFlowCategoryId ? createPortal(
         <div className="fertilizer-tools-overlay" role="presentation" onClick={closeAddFlow}>
           <section
             className="fertilizer-tools"
@@ -801,10 +872,11 @@ function FertilizersPage() {
                 </button>
             </section>
           </section>
-        </div>
+        </div>,
+        document.body,
       ) : null}
 
-      {baseLineReplacement ? (
+      {baseLineReplacement ? createPortal(
         <div
           className="fertilizer-tools-overlay fertilizer-tools-overlay--stacked fertilizer-tools-overlay--warning"
           role="presentation"
@@ -854,10 +926,11 @@ function FertilizersPage() {
               </button>
             </div>
           </section>
-        </div>
+        </div>,
+        document.body,
       ) : null}
 
-      {selectedLibraryPreset ? (
+      {selectedLibraryPreset ? createPortal(
         <div className="fertilizer-tools-overlay fertilizer-tools-overlay--details fertilizer-tools-overlay--stacked" role="presentation" onClick={closeLibraryDetails}>
           <section
             className="fertilizer-details-modal"
@@ -926,10 +999,11 @@ function FertilizersPage() {
               </div>
             </div>
           </section>
-        </div>
+        </div>,
+        document.body,
       ) : null}
 
-      {selectedFertilizer ? (
+      {selectedFertilizer ? createPortal(
         <div className="fertilizer-tools-overlay fertilizer-tools-overlay--details" role="presentation" onClick={closeFertilizerDetails}>
           <section
             className="fertilizer-details-modal"
@@ -1028,7 +1102,8 @@ function FertilizersPage() {
               </div>
             </div>
           </section>
-        </div>
+        </div>,
+        document.body,
       ) : null}
 
       <section className="fertilizer-overview" aria-label="Сводка по удобрениям">
@@ -1360,6 +1435,10 @@ function RecipePage({ params, updateParam }: PersistentParams) {
           </div>
         </div>
 
+        <p className="recipe-result__disclaimer">
+          Расчёт носит справочный характер. Сверяйте дозировки с актуальной инструкцией производителя и учитывайте качество воды, субстрат и состояние растений.
+        </p>
+
         <div className="recipe-result__tables">
           <section className="recipe-table" aria-labelledby="recipe-base-title">
             <h3 id="recipe-base-title">База</h3>
@@ -1443,67 +1522,342 @@ function RecipePage({ params, updateParam }: PersistentParams) {
 
 function App() {
   const [activePage, setActivePage] = useState<PageId>('calculator')
+  const [isHeaderScrolled, setIsHeaderScrolled] = useState(false)
+  const [swipeViewportHeight, setSwipeViewportHeight] = useState<number | null>(null)
+  const swipeStart = useRef<{
+    x: number
+    y: number
+    time: number
+    axis: 'x' | 'y' | null
+    viewportWidth: number
+    panelHeights: number[]
+  } | null>(null)
+  const swipeViewportRef = useRef<HTMLElement | null>(null)
+  const swipeTrackRef = useRef<HTMLDivElement | null>(null)
+  const topbarRef = useRef<HTMLElement | null>(null)
+  const swipePanelRefs = useRef<Record<PageId, HTMLDivElement | null>>({
+    calculator: null,
+    fertilizers: null,
+    recipe: null,
+  })
+  const swipeTransitionTimeout = useRef<number | null>(null)
+  const isSwipeTransitioning = useRef(false)
   const persistentParams = usePersistentParams()
+  const { t } = useAppPreferences()
+
+  const isMobileSwipeLayout = () => window.matchMedia(MOBILE_SWIPE_QUERY).matches
+
+  const syncMobileHeader = (scrollTop: number) => {
+    const topbar = topbarRef.current
+    if (!topbar) return
+    const travel = Math.min(scrollTop, MOBILE_HEADER_TRAVEL)
+    topbar.style.setProperty('--mobile-header-offset', `${-travel}px`)
+    topbar.style.setProperty('--mobile-header-opacity', `${Math.max(0, 1 - travel / MOBILE_HEADER_TRAVEL)}`)
+    topbar.style.pointerEvents = travel >= MOBILE_HEADER_TRAVEL ? 'none' : ''
+    setIsHeaderScrolled(scrollTop > 280)
+  }
+
+  useEffect(() => {
+    const updateHeaderState = () => {
+      if (isMobileSwipeLayout()) return
+      topbarRef.current?.style.removeProperty('--mobile-header-offset')
+      topbarRef.current?.style.removeProperty('--mobile-header-opacity')
+      if (topbarRef.current) topbarRef.current.style.pointerEvents = ''
+      setIsHeaderScrolled(window.scrollY > 280)
+    }
+
+    updateHeaderState()
+    window.addEventListener('scroll', updateHeaderState, { passive: true })
+    return () => window.removeEventListener('scroll', updateHeaderState)
+  }, [])
+
+  const positionSwipeTrack = (pageIndex: number, offset = 0, animate = false) => {
+    const track = swipeTrackRef.current
+    const viewport = swipeViewportRef.current
+    if (!track || !viewport) return
+    track.style.transition = animate
+      ? 'transform 380ms cubic-bezier(0.22, 0.92, 0.3, 1)'
+      : 'none'
+    track.style.transform = `translate3d(${(-pageIndex * viewport.clientWidth) + offset}px, 0, 0)`
+  }
+
+  const resizeSwipeViewport = useCallback((height: number, animate = false) => {
+    const viewport = swipeViewportRef.current
+    if (!viewport || isMobileSwipeLayout()) return
+    viewport.style.transition = animate
+      ? 'height 380ms cubic-bezier(0.22, 0.92, 0.3, 1)'
+      : 'none'
+    viewport.style.height = `${height}px`
+  }, [])
+
+  const getSwipePanelHeight = (pageIndex: number) => {
+    const page = PAGE_ORDER[pageIndex]
+    return page ? swipePanelRefs.current[page]?.scrollHeight ?? 0 : 0
+  }
+
+  const settleSwipeBack = (pageIndex: number) => {
+    if (swipeTransitionTimeout.current !== null) window.clearTimeout(swipeTransitionTimeout.current)
+    isSwipeTransitioning.current = true
+    positionSwipeTrack(pageIndex, 0, true)
+    const currentHeight = getSwipePanelHeight(pageIndex)
+    if (currentHeight) resizeSwipeViewport(currentHeight, true)
+    swipeTransitionTimeout.current = window.setTimeout(() => {
+      isSwipeTransitioning.current = false
+    }, 380)
+  }
+
+  useEffect(() => {
+    const index = PAGE_ORDER.indexOf(activePage)
+    const panel = swipePanelRefs.current[activePage]
+    if (!panel) return
+
+    const updateLayout = () => {
+      if (isMobileSwipeLayout()) {
+        setSwipeViewportHeight(null)
+        swipeViewportRef.current?.style.removeProperty('height')
+        swipeViewportRef.current?.style.removeProperty('transition')
+        syncMobileHeader(panel.scrollTop)
+      } else {
+        setSwipeViewportHeight(panel.scrollHeight)
+        resizeSwipeViewport(panel.scrollHeight)
+      }
+      positionSwipeTrack(index)
+    }
+    updateLayout()
+    const observer = new ResizeObserver(updateLayout)
+    observer.observe(panel)
+    window.addEventListener('resize', updateLayout)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', updateLayout)
+    }
+  }, [activePage, resizeSwipeViewport])
+
+  useEffect(() => () => {
+    if (swipeTransitionTimeout.current !== null) window.clearTimeout(swipeTransitionTimeout.current)
+  }, [])
+
+  const selectPage = (page: PageId) => {
+    if (page === activePage || isSwipeTransitioning.current) return
+    const nextHeight = swipePanelRefs.current[page]?.scrollHeight
+    if (nextHeight) resizeSwipeViewport(nextHeight)
+    if (!isMobileSwipeLayout()) window.scrollTo({ top: 0, behavior: 'auto' })
+    setActivePage(page)
+  }
+
+  const handlePanelScroll = (page: PageId, event: ReactUIEvent<HTMLDivElement>) => {
+    if (page !== activePage || !isMobileSwipeLayout()) return
+    syncMobileHeader(event.currentTarget.scrollTop)
+  }
+
+  const scrollActivePageToTop = () => {
+    if (isMobileSwipeLayout()) {
+      swipePanelRefs.current[activePage]?.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleSwipeStart = (event: ReactTouchEvent<HTMLElement>) => {
+    const target = event.target instanceof Element ? event.target : null
+    if (isSwipeTransitioning.current || event.touches.length !== 1 || target?.closest(SWIPE_BLOCK_SELECTOR)) {
+      swipeStart.current = null
+      return
+    }
+
+    const touch = event.touches[0]
+    swipeStart.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: performance.now(),
+      axis: null,
+      viewportWidth: swipeViewportRef.current?.clientWidth ?? 1,
+      panelHeights: PAGE_ORDER.map((_, index) => getSwipePanelHeight(index)),
+    }
+  }
+
+  const handleSwipeMove = (event: ReactTouchEvent<HTMLElement>) => {
+    const start = swipeStart.current
+    if (!start || event.touches.length !== 1) return
+
+    const touch = event.touches[0]
+    const deltaX = touch.clientX - start.x
+    const deltaY = touch.clientY - start.y
+    if (!start.axis && Math.max(Math.abs(deltaX), Math.abs(deltaY)) >= 7) {
+      start.axis = Math.abs(deltaX) > Math.abs(deltaY) * 1.04 ? 'x' : 'y'
+    }
+    if (start.axis !== 'x') return
+
+    event.preventDefault()
+    const currentIndex = PAGE_ORDER.indexOf(activePage)
+    const adjacentIndex = currentIndex + (deltaX < 0 ? 1 : -1)
+    const isOutsideStart = currentIndex === 0 && deltaX > 0
+    const isOutsideEnd = currentIndex === PAGE_ORDER.length - 1 && deltaX < 0
+    const dragOffset = isOutsideStart || isOutsideEnd
+      ? Math.sign(deltaX) * Math.pow(Math.abs(deltaX), 0.72) * 0.72
+      : deltaX
+    positionSwipeTrack(currentIndex, dragOffset)
+
+    const currentHeight = start.panelHeights[currentIndex] ?? 0
+    const adjacentHeight = start.panelHeights[adjacentIndex] ?? 0
+    if (adjacentHeight) {
+      const progress = Math.min(Math.abs(deltaX) / start.viewportWidth, 1)
+      const interpolatedHeight = currentHeight + ((adjacentHeight - currentHeight) * progress)
+      resizeSwipeViewport(Math.max(currentHeight, interpolatedHeight))
+    } else if (currentHeight) {
+      resizeSwipeViewport(currentHeight)
+    }
+  }
+
+  const handleSwipeEnd = (event: ReactTouchEvent<HTMLElement>) => {
+    const start = swipeStart.current
+    swipeStart.current = null
+    if (!start || event.changedTouches.length !== 1) return
+
+    const touch = event.changedTouches[0]
+    const deltaX = touch.clientX - start.x
+    const distance = Math.abs(deltaX)
+    const deltaY = touch.clientY - start.y
+    const duration = performance.now() - start.time
+    const velocity = distance / Math.max(duration, 1)
+    const isQuickFlick = duration <= SWIPE_FLICK_DURATION && distance >= SWIPE_FLICK_THRESHOLD
+    const currentIndex = PAGE_ORDER.indexOf(activePage)
+    const isHorizontal = start.axis === 'x' || (start.axis === null && distance > Math.abs(deltaY) * 1.04)
+    if (!isHorizontal) {
+      return
+    }
+    if ((!isQuickFlick && distance < SWIPE_THRESHOLD) && velocity < 0.38) {
+      settleSwipeBack(currentIndex)
+      return
+    }
+
+    const direction = deltaX < 0 ? 1 : -1
+    const nextIndex = currentIndex + direction
+    const nextPage = PAGE_ORDER[nextIndex]
+    if (!nextPage) {
+      settleSwipeBack(currentIndex)
+      return
+    }
+
+    if (swipeTransitionTimeout.current !== null) window.clearTimeout(swipeTransitionTimeout.current)
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    isSwipeTransitioning.current = true
+    positionSwipeTrack(nextIndex, 0, !prefersReducedMotion)
+    const nextHeight = getSwipePanelHeight(nextIndex)
+    if (nextHeight) resizeSwipeViewport(nextHeight, !prefersReducedMotion)
+    swipeTransitionTimeout.current = window.setTimeout(() => {
+      if (!isMobileSwipeLayout()) window.scrollTo({ top: 0, behavior: 'auto' })
+      setActivePage(nextPage)
+      isSwipeTransitioning.current = false
+    }, prefersReducedMotion ? 0 : 380)
+  }
 
   return (
-    <AppShell className={`app-shell--${activePage}`}>
-      <header className="topbar">
+    <>
+    <AppShell
+      className={`app-shell--${activePage}`}
+      onTouchStart={handleSwipeStart}
+      onTouchMove={handleSwipeMove}
+      onTouchEnd={handleSwipeEnd}
+      onTouchCancel={() => {
+        const wasHorizontal = swipeStart.current?.axis === 'x'
+        swipeStart.current = null
+        if (wasHorizontal) settleSwipeBack(PAGE_ORDER.indexOf(activePage))
+      }}
+    >
+      <header ref={topbarRef} className="topbar">
         <div className="topbar__heading">
           <div className="topbar__brand">
-            <img className="topbar__mark" src={dripCalcMark} alt="" />
-            <div className="topbar__title">DripCalc</div>
+            <img className="topbar__mark" src={mixmetryMark} alt="" />
+            <div className="topbar__title">Mixmetry</div>
           </div>
-          <h1 className="topbar__subtitle">{PAGE_TITLES[activePage]}</h1>
         </div>
-        <nav className="page-tabs" aria-label="Разделы приложения">
-          <button
-            className={`page-tabs__button page-tabs__button--calculator ${
-              activePage === 'calculator' ? 'page-tabs__button--active' : ''
-            }`}
-            type="button"
-            aria-label="Полив"
-            aria-current={activePage === 'calculator' ? 'page' : undefined}
-            onClick={() => setActivePage('calculator')}
-          >
-            <PageIcon page="calculator" />
-            <span className="page-tabs__label page-tabs__label--desktop">Полив</span>
-            <span className="page-tabs__label page-tabs__label--mobile">Полив</span>
-          </button>
-          <button
-            className={`page-tabs__button page-tabs__button--fertilizers ${
-              activePage === 'fertilizers' ? 'page-tabs__button--active' : ''
-            }`}
-            type="button"
-            aria-label="Мои удобрения"
-            aria-current={activePage === 'fertilizers' ? 'page' : undefined}
-            onClick={() => setActivePage('fertilizers')}
-          >
-            <PageIcon page="fertilizers" />
-            <span className="page-tabs__label page-tabs__label--desktop">Мои удобрения</span>
-            <span className="page-tabs__label page-tabs__label--mobile">Удобрения</span>
-          </button>
-          <button
-            className={`page-tabs__button page-tabs__button--recipe ${
-              activePage === 'recipe' ? 'page-tabs__button--active' : ''
-            }`}
-            type="button"
-            aria-label="Мой рецепт"
-            aria-current={activePage === 'recipe' ? 'page' : undefined}
-            onClick={() => setActivePage('recipe')}
-          >
-            <PageIcon page="recipe" />
-            <span className="page-tabs__label page-tabs__label--desktop">Мой рецепт</span>
-            <span className="page-tabs__label page-tabs__label--mobile">Рецепт</span>
-          </button>
-        </nav>
+        <div className="topbar__actions">
+        <PageNavigation
+          activePage={activePage}
+          className="page-tabs--desktop"
+          labels={{
+            sections: t('nav.sections'),
+            calculator: t('nav.calculator'),
+            fertilizers: t('nav.fertilizers'),
+            fertilizersShort: t('nav.fertilizersShort'),
+            recipe: t('nav.recipe'),
+            recipeShort: t('nav.recipeShort'),
+          }}
+          onSelect={selectPage}
+        />
+        <AppSettings />
+        </div>
       </header>
 
-      <main className="page">
-        {activePage === 'calculator' ? <CalculatorPage {...persistentParams} /> : null}
-        {activePage === 'recipe' ? <RecipePage {...persistentParams} /> : null}
-        {activePage === 'fertilizers' ? <FertilizersPage /> : null}
+      <button
+        className={`back-to-top${isHeaderScrolled ? ' back-to-top--visible' : ''}`}
+        type="button"
+        aria-label={t('actions.backToTop')}
+        aria-hidden={!isHeaderScrolled}
+        tabIndex={isHeaderScrolled ? 0 : -1}
+        onClick={scrollActivePageToTop}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m6 14 6-6 6 6" />
+        </svg>
+      </button>
+
+      <main
+        ref={swipeViewportRef}
+        className="swipe-viewport"
+        style={swipeViewportHeight ? { height: `${swipeViewportHeight}px` } : undefined}
+      >
+        <div ref={swipeTrackRef} className="swipe-track">
+          <div
+            ref={(node) => { swipePanelRefs.current.calculator = node }}
+            className="page swipe-panel"
+            aria-hidden={activePage !== 'calculator'}
+            inert={activePage !== 'calculator'}
+            onScroll={(event) => handlePanelScroll('calculator', event)}
+          >
+            <CalculatorPage {...persistentParams} />
+          </div>
+          <div
+            ref={(node) => { swipePanelRefs.current.fertilizers = node }}
+            className="page swipe-panel"
+            aria-hidden={activePage !== 'fertilizers'}
+            inert={activePage !== 'fertilizers'}
+            onScroll={(event) => handlePanelScroll('fertilizers', event)}
+          >
+            <FertilizersPage />
+          </div>
+          <div
+            ref={(node) => { swipePanelRefs.current.recipe = node }}
+            className="page swipe-panel"
+            aria-hidden={activePage !== 'recipe'}
+            inert={activePage !== 'recipe'}
+            onScroll={(event) => handlePanelScroll('recipe', event)}
+          >
+            <RecipePage {...persistentParams} />
+          </div>
+        </div>
       </main>
     </AppShell>
+    {createPortal(
+      <div className="mobile-nav-dock">
+        <PageNavigation
+          activePage={activePage}
+          className="page-tabs--mobile"
+          labels={{
+            sections: t('nav.sections'),
+            calculator: t('nav.calculator'),
+            fertilizers: t('nav.fertilizers'),
+            fertilizersShort: t('nav.fertilizersShort'),
+            recipe: t('nav.recipe'),
+            recipeShort: t('nav.recipeShort'),
+          }}
+          onSelect={selectPage}
+        />
+      </div>,
+      document.body,
+    )}
+    </>
   )
 }
 

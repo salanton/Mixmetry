@@ -27,14 +27,20 @@ export function createCalendarEvent(
   end.setDate(end.getDate() + 1)
   const endDate = formatDate(end)
   const escapedTitle = escapeText(title)
+  const uid = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? `${crypto.randomUUID()}@mixmetry.app`
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}@mixmetry.app`
+  const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z')
 
   const icsContent = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//DripCalc//Calendar Event//RU',
+    'PRODID:-//Mixmetry//Calendar Event//RU',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${timestamp}`,
     `DTSTART;VALUE=DATE:${startDate}`,
     `DTEND;VALUE=DATE:${endDate}`,
     `SUMMARY:${escapedTitle}`,
@@ -68,7 +74,12 @@ export function downloadCalendarFile(
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `напоминание-${date.toISOString().split('T')[0]}.ics`
+  const localDate = [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-')
+  link.download = `напоминание-${localDate}.ics`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)

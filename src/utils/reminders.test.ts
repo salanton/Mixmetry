@@ -7,6 +7,8 @@ describe('createCalendarEvent', () => {
 
     expect(ics).toContain('DTSTART;VALUE=DATE:20260727')
     expect(ics).toContain('DTEND;VALUE=DATE:20260728')
+    expect(ics).toMatch(/UID:[^\r\n]+@mixmetry\.app/)
+    expect(ics).toMatch(/DTSTAMP:\d{8}T\d{6}Z/)
   })
 
   it('rolls the end date into the next month and year', () => {

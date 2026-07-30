@@ -12,7 +12,7 @@ class AppErrorBoundary extends Component<PropsWithChildren, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('DripCalc render error', error, info.componentStack)
+    console.error('Mixmetry render error', error, info.componentStack)
   }
 
   private reload = () => window.location.reload()
@@ -23,7 +23,7 @@ class AppErrorBoundary extends Component<PropsWithChildren, State> {
     return (
       <main className="app-error" role="alert">
         <div className="app-error__panel">
-          <p className="app-error__eyebrow">DripCalc</p>
+          <p className="app-error__eyebrow">Mixmetry</p>
           <h1>Не удалось открыть приложение</h1>
           <p>Перезапустите экран. Сохранённые параметры останутся в браузере.</p>
           <button type="button" onClick={this.reload}>Перезапустить</button>

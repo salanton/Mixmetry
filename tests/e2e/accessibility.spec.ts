@@ -27,3 +27,14 @@ test('recipe has no serious accessibility violations', async ({ page }) => {
   await page.getByRole('button', { name: 'Мой рецепт' }).click()
   await expectNoSeriousViolations(page)
 })
+
+test('dark theme pages have no serious accessibility violations', async ({ page }) => {
+  await page.getByRole('button', { name: 'Открыть настройки' }).click()
+  await page.getByRole('dialog', { name: 'Настройки' }).getByText('Тёмная', { exact: true }).click()
+  await page.getByRole('button', { name: 'Закрыть настройки' }).click()
+
+  for (const pageName of ['Полив', 'Мои удобрения', 'Мой рецепт']) {
+    await page.getByRole('button', { name: pageName }).click()
+    await expectNoSeriousViolations(page)
+  }
+})

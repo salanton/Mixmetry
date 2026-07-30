@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
   color: var(--text, #0f172a);
-  background-color: var(--app-bg, #f5f6f9);
+  background-color: var(--app-bg, #f4f7f6);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -17,16 +17,16 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--app-bg, #f5f6f9);
+  min-height: 100dvh;
+  background: var(--app-bg, #f4f7f6);
   color: var(--text, #0f172a);
   font-size: 16px;
   overscroll-behavior-y: none;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
-    env(safe-area-inset-left);
 }
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 a {

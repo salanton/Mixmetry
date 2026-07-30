@@ -6,14 +6,24 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
     />
-    <meta name="theme-color" content="#f5f6f9" />
+    <meta name="theme-color" content="#f4f7f6" />
     <link rel="icon" type="image/png" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="DripCalc" />
-    <meta name="application-name" content="DripCalc" />
-    <title>DripCalc — Калькулятор автополива</title>
+    <meta name="apple-mobile-web-app-title" content="Mixmetry" />
+    <meta name="application-name" content="Mixmetry" />
+    <script>
+      try {
+        const saved = JSON.parse(localStorage.getItem('dripcalc:preferences:v1') || '{}')
+        const dark = saved.theme === 'dark'
+          || (saved.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0f1715' : '#f4f7f6')
+      } catch {}
+    </script>
+    <title>Mixmetry — Полив и питание растений</title>
   </head>
   <body>
     <div id="root"></div>
