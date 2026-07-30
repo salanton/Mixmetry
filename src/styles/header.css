@@ -1,4 +1,22 @@
 /* The header shares the page canvas instead of forming a separate color band. */
+:root[data-theme="dark"] .page-tabs__button--calculator.page-tabs__button--active {
+  color: #76bde0;
+  border-color: rgba(118, 189, 224, 0.38);
+  background: rgba(91, 168, 205, 0.15);
+}
+
+:root[data-theme="dark"] .page-tabs__button--fertilizers.page-tabs__button--active {
+  color: #6bd2bd;
+  border-color: rgba(107, 210, 189, 0.36);
+  background: rgba(82, 188, 167, 0.15);
+}
+
+:root[data-theme="dark"] .page-tabs__button--recipe.page-tabs__button--active {
+  color: #beb4ee;
+  border-color: rgba(190, 180, 238, 0.36);
+  background: rgba(167, 155, 224, 0.15);
+}
+
 .topbar {
   background: transparent;
   backdrop-filter: none;
@@ -61,4 +79,3 @@
     transition: none;
   }
 }
-
