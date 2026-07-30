@@ -14,7 +14,6 @@ body {
 }
 
 .app-shell { max-width: 1160px; }
-.topbar { background: color-mix(in srgb, var(--app-bg) 88%, transparent); }
 .topbar__title { color: var(--text); font-weight: 820; letter-spacing: -0.035em; }
 .topbar__subtitle { font-size: 0.82rem; font-weight: 650; }
 
@@ -276,7 +275,7 @@ body {
 .fertilizer-library__card:hover { border-color: var(--accent-border); background: var(--surface); }
 
 .fertilizer-card__media { border-radius: 12px; background: var(--accent-soft); color: var(--accent-strong); }
-.fertilizer-manufacturer-group__title { color: var(--accent-strong); letter-spacing: 0.07em; }
+.fertilizer-manufacturer-group__title { letter-spacing: 0.07em; }
 .fertilizer-card__chip,
 .fertilizer-category__count { border: 1px solid var(--accent-border); background: var(--accent-soft); color: var(--accent-strong); }
 
@@ -302,7 +301,7 @@ body {
 .fertilizer-line-warning__confirm { border-radius: var(--radius-control); background: var(--accent-strong); color: #fff; box-shadow: none; }
 .reminder-button__text { color: #fff; font-weight: 760; }
 .reminder-button svg { stroke: #fff; }
-.reminder-button:hover { background: #126e5f; border-color: transparent; box-shadow: none; }
+.reminder-button:hover { box-shadow: none; }
 
 .fertilizer-flow-actions__secondary,
 .fertilizer-line-warning__cancel { border: 1px solid var(--border-strong); border-radius: var(--radius-control); background: var(--surface-soft); color: var(--text); }
@@ -443,10 +442,6 @@ body {
   font-size: 1rem;
 }
 
-.recipe-result__summary {
-  gap: 0.65rem;
-}
-
 .recipe-result__tile {
   min-height: 76px;
   padding: 0.7rem 0.8rem;
@@ -548,8 +543,6 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    background: transparent;
-    backdrop-filter: none;
   }
 
   .topbar__heading,
@@ -595,19 +588,6 @@ body {
 
   .topbar__heading {
     flex: 1 1 auto;
-  }
-
-  .topbar__brand {
-    gap: 0.4rem;
-  }
-
-  .topbar__mark {
-    width: 1.8rem;
-    height: 1.8rem;
-  }
-
-  .topbar__title {
-    font-size: 1.16rem;
   }
 
   .topbar__subtitle {
@@ -701,10 +681,6 @@ body {
     flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 0.1rem;
-  }
-
-  .summary__time {
-    min-width: 64px;
   }
 
   .schedule-table__head,
@@ -807,10 +783,6 @@ body {
 }
 
 /* Fertilizers use the same instrument hierarchy as calculator data. */
-
-.fertilizer-overview__tile > span {
-  color: var(--text-muted);
-}
 
 @media (max-width: 639px) {
 }
@@ -1088,12 +1060,8 @@ body {
 .fertilizer-overview {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) repeat(2, minmax(150px, 0.75fr));
-  gap: 0.65rem;
-  padding: 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  background: var(--surface);
   box-shadow: var(--shadow-card);
   overflow: hidden;
 }
@@ -1122,7 +1090,6 @@ body {
 }
 
 .fertilizer-overview__tile--base {
-  align-items: center;
   justify-items: start;
   border-color: var(--accent-border);
   background: var(--accent-soft);
@@ -1152,7 +1119,6 @@ body {
 }
 
 .fertilizer-overview__tile--base strong {
-  color: var(--text);
   font-family: inherit;
   font-size: 0.98rem;
 }
@@ -1198,10 +1164,6 @@ body {
 }
 
 @media (max-width: 639px) {
-  .fertilizer-overview {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 0.65rem;
-  }
 
   .fertilizer-overview__tile--base {
     grid-column: 1 / -1;
@@ -1215,7 +1177,6 @@ body {
 /* Final fertilizer alignment layer. */
 .fertilizer-overview {
   gap: 0;
-  padding: 0.7rem 1rem;
   border-color: var(--data-border);
   background: linear-gradient(135deg, var(--surface) 0%, var(--data-soft) 145%);
 }
@@ -1225,8 +1186,6 @@ body {
 
 .fertilizer-overview__tile,
 .fertilizer-overview__tile--base {
-  min-height: 58px;
-  padding: 0.25rem 1rem;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1241,7 +1200,7 @@ body {
 .fertilizer-card-grid { gap: 0.55rem; }
 
 @media (max-width: 639px) {
-  .fertilizer-overview { gap: 0; padding: 0.65rem 0.75rem; }
+  .fertilizer-overview { gap: 0; }
   .fertilizer-overview__tile--base { padding-bottom: 0.65rem; border-bottom: 1px solid var(--data-border); }
   .fertilizer-overview__tile + .fertilizer-overview__tile { border-left: 0; }
   .fertilizer-overview__tile:last-child { border-left: 1px solid var(--data-border); }
