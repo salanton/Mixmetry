@@ -739,6 +739,14 @@ body {
 }
 
 .recipe-picker-overlay {
+  --accent: #756aac;
+  --accent-strong: #625893;
+  --accent-soft: rgba(117, 106, 172, 0.11);
+  --accent-border: rgba(117, 106, 172, 0.34);
+  --accent-focus: rgba(117, 106, 172, 0.24);
+  --data: #625d8f;
+  --data-soft: rgba(98, 93, 143, 0.1);
+  --data-border: rgba(98, 93, 143, 0.28);
   position: fixed;
   inset: 0;
   display: grid;
@@ -747,6 +755,17 @@ body {
   background: rgba(15, 23, 42, 0.36);
   backdrop-filter: blur(10px);
   z-index: 50;
+}
+
+:root[data-theme="dark"] .recipe-picker-overlay {
+  --accent: #a79be0;
+  --accent-strong: #beb4ee;
+  --accent-soft: rgba(167, 155, 224, 0.15);
+  --accent-border: rgba(190, 180, 238, 0.36);
+  --accent-focus: rgba(190, 180, 238, 0.24);
+  --data: #beb4ee;
+  --data-soft: rgba(167, 155, 224, 0.13);
+  --data-border: rgba(190, 180, 238, 0.28);
 }
 
 .recipe-picker {

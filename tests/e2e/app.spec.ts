@@ -79,6 +79,30 @@ test('selects and replaces a base line and updates the recipe', async ({ page })
   await expect(page.getByText(/Расчёт носит справочный характер/)).toBeVisible()
 })
 
+test('keeps recipe pickers attached to the viewport', async ({ page }) => {
+  await page.getByRole('button', { name: 'Мой рецепт' }).click()
+  await page.locator('.recipe-card--method .recipe-choice-button').click()
+
+  const picker = page.getByRole('dialog', { name: 'Выбор: Метод выращивания' })
+  await expect(picker).toBeVisible()
+  const geometry = await picker.evaluate((element) => {
+    const rect = element.getBoundingClientRect()
+    return {
+      isPortaled: element.parentElement?.parentElement === document.body,
+      top: rect.top,
+      bottom: rect.bottom,
+      viewportHeight: window.innerHeight,
+    }
+  })
+  expect(geometry.isPortaled).toBe(true)
+  expect(geometry.top).toBeGreaterThanOrEqual(0)
+  expect(geometry.bottom).toBeLessThanOrEqual(geometry.viewportHeight)
+
+  await picker.getByRole('button', { name: /Кокос/ }).click()
+  await expect(picker).toHaveCount(0)
+  await expect(page.locator('.recipe-card--method .recipe-choice-button__value')).toHaveText('Кокос')
+})
+
 test('persists calculator settings after reload', async ({ page }) => {
   const waterings = page.getByRole('slider', { name: 'Количество включений' })
   await waterings.fill('2')
@@ -137,7 +161,7 @@ test('reloads the installed application shell while offline', async ({ page, con
   await context.setOffline(false)
 })
 
-test('applies and persists theme preferences without exposing an incomplete language switcher', async ({ page }) => {
+test('applies and persists language and theme preferences', async ({ page }) => {
   await page.getByRole('button', { name: 'Открыть настройки' }).click()
   const settings = page.getByRole('dialog', { name: 'Настройки' })
   await expect(settings).toBeVisible()
@@ -146,12 +170,13 @@ test('applies and persists theme preferences without exposing an incomplete lang
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0f1715')
 
-  await expect(settings.getByText('English', { exact: true })).toHaveCount(0)
-  await expect(page.locator('html')).toHaveAttribute('lang', 'ru')
+  await settings.getByText('English', { exact: true }).click()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  await expect(page.getByRole('button', { name: 'Watering' })).toHaveAttribute('aria-current', 'page')
 
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
-  await expect(page.locator('html')).toHaveAttribute('lang', 'ru')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 })
 
 test('keeps the mobile navigation fixed and content within the viewport', async ({ page }, testInfo) => {

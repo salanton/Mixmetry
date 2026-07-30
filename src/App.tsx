@@ -1197,7 +1197,7 @@ function RecipePage({ params, updateParam }: PersistentParams) {
 
   useModalAccessibility(
     openRecipePicker,
-    '.recipe-page [role="dialog"]',
+    '.recipe-picker',
     () => setOpenRecipePicker(null),
   )
   const { fertilizers } = usePersistentFertilizers()
@@ -1266,7 +1266,7 @@ function RecipePage({ params, updateParam }: PersistentParams) {
 
   return (
     <section className="recipe-page" aria-label="Мой рецепт">
-      {openRecipePicker ? (
+      {openRecipePicker ? createPortal(
         <div className="recipe-picker-overlay" role="presentation" onClick={() => setOpenRecipePicker(null)}>
           <section
             className="recipe-picker"
@@ -1336,7 +1336,8 @@ function RecipePage({ params, updateParam }: PersistentParams) {
               </div>
             </div>
           </section>
-        </div>
+        </div>,
+        document.body,
       ) : null}
 
       <ControlsGrid>

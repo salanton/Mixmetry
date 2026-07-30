@@ -91,18 +91,20 @@ type AppPreferencesContextValue = {
 const STORAGE_KEY = 'dripcalc:preferences:v1'
 const AppPreferencesContext = createContext<AppPreferencesContextValue | null>(null)
 
+const getDeviceLanguage = (): AppLanguage =>
+  typeof navigator !== 'undefined' && navigator.language.toLowerCase().startsWith('ru') ? 'ru' : 'en'
+
 const getSystemTheme = (): 'light' | 'dark' =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 
 const readPreferences = () => {
-  const fallback = { language: 'ru' as AppLanguage, theme: 'system' as ThemePreference }
+  const fallback = { language: getDeviceLanguage(), theme: 'system' as ThemePreference }
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY)
     if (!stored) return fallback
     const parsed = JSON.parse(stored) as Partial<typeof fallback>
     return {
-      // English remains hidden until every product flow is fully translated.
-      language: 'ru' as AppLanguage,
+      language: parsed.language === 'ru' || parsed.language === 'en' ? parsed.language : fallback.language,
       theme: parsed.theme === 'light' || parsed.theme === 'dark' || parsed.theme === 'system'
         ? parsed.theme
         : fallback.theme,
