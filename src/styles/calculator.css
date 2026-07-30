@@ -261,66 +261,6 @@
   box-shadow: 0 0 0 3px var(--accent-focus);
 }
 
-.stepper {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.stepper__controls {
-  display: grid;
-  grid-template-columns: 60px 1fr 60px;
-  align-items: stretch;
-  gap: 0.4rem;
-}
-
-.stepper__btn {
-  width: 100%;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--surface-soft);
-  color: var(--text);
-  font-size: 1.2rem;
-  border: 1px solid var(--border);
-}
-
-.stepper__btn:active {
-  background: var(--border);
-}
-
-.stepper__btn:disabled {
-  opacity: 0.5;
-}
-
-.stepper__value {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.4rem;
-  padding: 0 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface-muted);
-  height: 48px;
-}
-
-.stepper__value input {
-  border: none;
-  width: 100%;
-  background: transparent;
-  color: var(--text);
-  text-align: center;
-}
-
-.stepper__value input:focus {
-  outline: none;
-}
-
-.stepper__suffix {
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
 .chip {
   min-width: 72px;
   width: 100%;
@@ -375,7 +315,11 @@
   border: 0.5px solid rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   cursor: pointer;
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
   align-self: center;
   height: fit-content;
@@ -558,4 +502,3 @@
   color: var(--accent-strong);
   font-weight: 600;
 }
-

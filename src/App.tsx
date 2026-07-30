@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import AppShell from './components/AppShell'
 import AppSettings from './components/AppSettings'
 import PageNavigation from './components/PageNavigation'
+import PwaUpdateNotice from './components/PwaUpdateNotice'
 import { usePersistentFertilizers } from './hooks/usePersistentFertilizers'
 import { usePersistentParams } from './hooks/usePersistentParams'
 import { useSwipeNavigation } from './hooks/useSwipeNavigation'
@@ -115,6 +116,7 @@ function App() {
         </div>
       </main>
     </AppShell>
+    <PwaUpdateNotice />
     {createPortal(
       <div className={`mobile-nav-dock app-shell--${activePage}`}>
         <PageNavigation

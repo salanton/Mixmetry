@@ -132,10 +132,10 @@
 .fertilizer-tools__close:focus-visible,
 .fertilizer-library__item:focus-visible,
 .fertilizer-library__preview:focus-visible,
+.fertilizer-library__card:focus-visible,
 .fertilizer-card__main:focus-visible,
 .fertilizer-flow-actions__secondary:focus-visible,
 .reminder-button:focus-visible,
-.stepper__btn:focus-visible,
 .chip:focus-visible,
 .text-btn:focus-visible {
   outline: none;
@@ -181,19 +181,6 @@
   flex: 0 0 calc((100% - (var(--swipe-page-gap) * 2)) / 3);
   height: max-content;
   min-width: 0;
-}
-
-.recipe-picker__close:focus-visible,
-.fertilizer-tools__close:focus-visible,
-.fertilizer-library__card:focus-visible,
-.fertilizer-card__main:focus-visible,
-.fertilizer-flow-actions__secondary:focus-visible,
-.reminder-button:focus-visible,
-.stepper__btn:focus-visible,
-.chip:focus-visible,
-.text-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--accent-focus);
 }
 
 .page {

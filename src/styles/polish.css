@@ -55,8 +55,7 @@ body {
 .summary__number,
 .schedule-table__volume,
 .schedule-table__number,
-.recipe-result__tile strong,
-.stepper__value {
+.recipe-result__tile strong {
   color: var(--data);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.025em;

@@ -20,6 +20,16 @@ export default defineConfig({
       name: 'mobile-chromium',
       use: { ...devices['Pixel 7'] },
     },
+    {
+      name: 'desktop-firefox-smoke',
+      testMatch: /smoke\.spec\.ts/,
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'mobile-webkit-smoke',
+      testMatch: /smoke\.spec\.ts/,
+      use: { ...devices['iPhone 15'] },
+    },
   ],
   webServer: {
     command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4173',
