@@ -88,6 +88,7 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
         contentClientHeight: content?.clientHeight ?? 0,
         contentScrollHeight: content?.scrollHeight ?? 0,
         contentOverflowY: content ? getComputedStyle(content).overflowY : '',
+        contentScrollbarWidth: content ? getComputedStyle(content).scrollbarWidth : '',
         contentBottomGap: modal && content
           ? Math.abs(modal.getBoundingClientRect().bottom - content.getBoundingClientRect().bottom)
           : Number.POSITIVE_INFINITY,
@@ -99,6 +100,7 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
     expect(geometry.actionButtonBottomGap).toBeLessThan(8)
     expect(Math.abs(geometry.actionButtonTopGap - geometry.actionButtonBottomGap)).toBeLessThanOrEqual(1)
     expect(geometry.contentOverflowY).toBe('auto')
+    expect(geometry.contentScrollbarWidth).toBe('none')
     expect(geometry.contentBottomGap).toBeLessThanOrEqual(1)
     expect(geometry.modalBorderRightWidth).toBe('0px')
     expect(geometry.modalBorderBottomWidth).toBe('0px')

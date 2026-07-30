@@ -3750,7 +3750,12 @@ body {
     padding-bottom: 5rem;
     scroll-padding-bottom: 5rem;
     overscroll-behavior: contain;
+    scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .fertilizer-details-modal .fertilizer-card__details::-webkit-scrollbar {
+    display: none;
   }
 
   .fertilizer-details-actions {
