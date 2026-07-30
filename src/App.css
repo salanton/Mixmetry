@@ -3745,11 +3745,18 @@ body {
     position: relative;
     inset: auto;
     z-index: 2;
-    margin: 0 -1rem -1rem;
-    padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
-    padding-top: 0.35rem;
-    padding-bottom: 0.35rem;
-    box-shadow: 0 -12px 28px -22px rgba(15, 23, 42, 0.7);
+    margin: 0.35rem -0.5rem -0.5rem;
+    padding: 0.25rem;
+    border: 1px solid color-mix(in srgb, var(--border-strong) 88%, transparent);
+    border-radius: 22px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: 0 14px 34px -18px rgba(19, 35, 31, 0.58), 0 2px 8px rgba(19, 35, 31, 0.1);
+    backdrop-filter: blur(18px);
+  }
+
+  .fertilizer-details-actions__change,
+  .fertilizer-details-actions__more {
+    border-radius: 16px;
   }
 
   .fertilizer-dosage-table {

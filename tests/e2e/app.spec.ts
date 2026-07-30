@@ -89,7 +89,7 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
         contentOverflowY: content ? getComputedStyle(content).overflowY : '',
       }
     })
-    expect(geometry.actionGap).toBeLessThanOrEqual(1)
+    expect(geometry.actionGap).toBeLessThanOrEqual(9)
     expect(geometry.actionButtonBottomGap).toBeLessThan(8)
     expect(Math.abs(geometry.actionButtonTopGap - geometry.actionButtonBottomGap)).toBeLessThanOrEqual(1)
     expect(geometry.contentOverflowY).toBe('auto')
