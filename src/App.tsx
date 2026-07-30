@@ -1971,7 +1971,7 @@ function App() {
       </main>
     </AppShell>
     {createPortal(
-      <div className="mobile-nav-dock">
+      <div className={`mobile-nav-dock app-shell--${activePage}`}>
         <PageNavigation
           activePage={activePage}
           className="page-tabs--mobile"

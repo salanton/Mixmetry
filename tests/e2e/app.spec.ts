@@ -278,9 +278,21 @@ test('keeps the mobile navigation fixed and content within the viewport', async 
   test.skip(!testInfo.project.name.startsWith('mobile'), 'Mobile-only layout assertion')
 
   const navigation = page.getByRole('navigation', { name: 'Разделы приложения' })
+  const mobileNavigation = page.locator('.mobile-nav-dock')
   await expect(page.locator('.mobile-nav-dock')).toHaveCSS('position', 'fixed')
   await expect(navigation).toHaveCSS('position', 'static')
   await expect(page.getByRole('button', { name: 'Полив' })).toHaveCSS('min-height', '48px')
+
+  const calculatorButton = mobileNavigation.getByRole('button', { name: 'Полив' })
+  const fertilizersButton = mobileNavigation.getByRole('button', { name: 'Мои удобрения' })
+  const recipeButton = mobileNavigation.getByRole('button', { name: 'Мой рецепт' })
+  await expect(calculatorButton).toHaveCSS('color', 'rgb(40, 111, 145)')
+  await fertilizersButton.click()
+  await expect(fertilizersButton).toHaveAttribute('aria-current', 'page')
+  await expect(fertilizersButton).toHaveCSS('color', 'rgb(22, 122, 105)')
+  await recipeButton.click()
+  await expect(recipeButton).toHaveAttribute('aria-current', 'page')
+  await expect(recipeButton).toHaveCSS('color', 'rgb(98, 88, 147)')
 
   const geometry = await page.evaluate(() => {
     const shell = document.querySelector<HTMLElement>('.app-shell')!.getBoundingClientRect()
