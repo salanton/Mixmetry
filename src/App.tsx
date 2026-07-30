@@ -46,6 +46,7 @@ const SWIPE_BLOCK_SELECTOR = [
 function App() {
   const [activePage, setActivePage] = useState<PageId>('calculator')
   const [isHeaderScrolled, setIsHeaderScrolled] = useState(false)
+  const [isHeaderOverContent, setIsHeaderOverContent] = useState(false)
   const [swipeViewportHeight, setSwipeViewportHeight] = useState<number | null>(null)
   const swipeStart = useRef<{
     x: number
@@ -71,12 +72,14 @@ function App() {
   const isMobileSwipeLayout = () => window.matchMedia(MOBILE_SWIPE_QUERY).matches
 
   const syncMobileHeader = (scrollTop: number) => {
+    setIsHeaderOverContent(scrollTop > 8)
     setIsHeaderScrolled(scrollTop > 280)
   }
 
   useEffect(() => {
     const updateHeaderState = () => {
       if (isMobileSwipeLayout()) return
+      setIsHeaderOverContent(window.scrollY > 8)
       setIsHeaderScrolled(window.scrollY > 280)
     }
 
@@ -282,7 +285,7 @@ function App() {
         if (wasHorizontal) settleSwipeBack(PAGE_ORDER.indexOf(activePage))
       }}
     >
-      <header className="topbar">
+      <header className={`topbar${isHeaderOverContent ? ' topbar--over-content' : ''}`}>
         <div className="topbar__heading">
           <div className="topbar__brand">
             <img className="topbar__mark" src={mixmetryMark} alt="" />

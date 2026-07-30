@@ -159,6 +159,21 @@
   .topbar__brand {
     min-height: 2.625rem;
     gap: 0.5rem;
+    margin-left: -0.3rem;
+    padding: 0.125rem 0.625rem 0.125rem 0.3rem;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: blur(0);
+    transition: border-color 180ms ease, background 180ms ease, box-shadow 200ms ease, backdrop-filter 200ms ease;
+  }
+
+  .topbar--over-content .topbar__brand {
+    border-color: color-mix(in srgb, var(--border-strong) 88%, transparent);
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: 0 12px 28px -20px rgba(19, 35, 31, 0.58), 0 2px 8px rgba(19, 35, 31, 0.08);
+    backdrop-filter: blur(18px);
   }
 
   .topbar__mark {
