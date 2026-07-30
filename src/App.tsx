@@ -1701,7 +1701,8 @@ function App() {
     track.style.transition = animate
       ? 'transform 380ms cubic-bezier(0.22, 0.92, 0.3, 1)'
       : 'none'
-    track.style.transform = `translate3d(${(-pageIndex * viewport.clientWidth) + offset}px, 0, 0)`
+    const viewportWidth = viewport.getBoundingClientRect().width
+    track.style.transform = `translate3d(${(-pageIndex * viewportWidth) + offset}px, 0, 0)`
   }
 
   const resizeSwipeViewport = useCallback((height: number, animate = false) => {
@@ -1795,7 +1796,7 @@ function App() {
       y: touch.clientY,
       time: performance.now(),
       axis: null,
-      viewportWidth: swipeViewportRef.current?.clientWidth ?? 1,
+      viewportWidth: swipeViewportRef.current?.getBoundingClientRect().width ?? 1,
       panelHeights: PAGE_ORDER.map((_, index) => getSwipePanelHeight(index)),
     }
   }

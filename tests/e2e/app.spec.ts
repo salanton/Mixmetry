@@ -356,7 +356,9 @@ test('gives every mobile page an independent scroll container', async ({ page },
     const activePanel = document.querySelector<HTMLElement>('.swipe-panel[aria-hidden="false"]')!
     return {
       viewportHeight: viewport.getBoundingClientRect().height,
+      viewportLeft: viewport.getBoundingClientRect().left,
       trackHeight: track.getBoundingClientRect().height,
+      activeLeft: activePanel.getBoundingClientRect().left,
       activeClientHeight: activePanel.clientHeight,
       activeScrollHeight: activePanel.scrollHeight,
       overflow: getComputedStyle(viewport).overflow,
@@ -371,6 +373,7 @@ test('gives every mobile page an independent scroll container', async ({ page },
     await expect.poll(async () => {
       const geometry = await readGeometry()
       return Math.abs(geometry.viewportHeight - geometry.activeClientHeight) < 2
+        && Math.abs(geometry.viewportLeft - geometry.activeLeft) < 0.02
         && Math.abs(geometry.trackHeight - geometry.viewportHeight) < 2
         && geometry.overflow === 'hidden'
         && geometry.panelOverflowY === 'auto'
