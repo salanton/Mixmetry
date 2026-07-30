@@ -3708,7 +3708,19 @@ body {
 
   .fertilizer-details-modal {
     min-height: 100dvh;
+    padding-top: calc(1rem + env(safe-area-inset-top));
     border-radius: 0;
+  }
+
+  .fertilizer-details-modal > .fertilizer-tools__bar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin-top: calc(-1rem - env(safe-area-inset-top));
+    margin-inline: -1rem;
+    padding: calc(1rem + env(safe-area-inset-top)) 1rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
   }
 
   .fertilizer-card__details {
