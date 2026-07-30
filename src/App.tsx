@@ -45,7 +45,6 @@ const SWIPE_BLOCK_SELECTOR = [
 ].join(',')
 function App() {
   const [activePage, setActivePage] = useState<PageId>('calculator')
-  const [isHeaderScrolled, setIsHeaderScrolled] = useState(false)
   const [isHeaderOverContent, setIsHeaderOverContent] = useState(false)
   const [swipeViewportHeight, setSwipeViewportHeight] = useState<number | null>(null)
   const swipeStart = useRef<{
@@ -73,14 +72,12 @@ function App() {
 
   const syncMobileHeader = (scrollTop: number) => {
     setIsHeaderOverContent(scrollTop > 8)
-    setIsHeaderScrolled(scrollTop > 280)
   }
 
   useEffect(() => {
     const updateHeaderState = () => {
       if (isMobileSwipeLayout()) return
       setIsHeaderOverContent(window.scrollY > 8)
-      setIsHeaderScrolled(window.scrollY > 280)
     }
 
     updateHeaderState()
@@ -287,10 +284,23 @@ function App() {
     >
       <header className={`topbar${isHeaderOverContent ? ' topbar--over-content' : ''}`}>
         <div className="topbar__heading">
-          <div className="topbar__brand">
-            <img className="topbar__mark" src={mixmetryMark} alt="" />
-            <div className="topbar__title">Mixmetry</div>
-          </div>
+          <button
+            className="topbar__brand"
+            type="button"
+            disabled={!isHeaderOverContent}
+            aria-label={isHeaderOverContent ? t('actions.backToTop') : undefined}
+            onClick={scrollActivePageToTop}
+          >
+            <span className="topbar__identity">
+              <img className="topbar__mark" src={mixmetryMark} alt="" />
+              <span className="topbar__title">Mixmetry</span>
+            </span>
+            <span className="topbar__brand-return" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="m6 14 6-6 6 6" />
+              </svg>
+            </span>
+          </button>
         </div>
         <div className="topbar__actions">
         <PageNavigation
@@ -309,19 +319,6 @@ function App() {
         <AppSettings />
         </div>
       </header>
-
-      <button
-        className={`back-to-top${isHeaderScrolled ? ' back-to-top--visible' : ''}`}
-        type="button"
-        aria-label={t('actions.backToTop')}
-        aria-hidden={!isHeaderScrolled}
-        tabIndex={isHeaderScrolled ? 0 : -1}
-        onClick={scrollActivePageToTop}
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m6 14 6-6 6 6" />
-        </svg>
-      </button>
 
       <main
         ref={swipeViewportRef}
