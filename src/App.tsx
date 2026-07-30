@@ -1032,6 +1032,7 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
       ) : null}
 
       {selectedLibraryPreset ? createPortal(
+        <>
         <div className="fertilizer-tools-overlay fertilizer-tools-overlay--details fertilizer-tools-overlay--stacked" role="presentation" onClick={closeLibraryDetails}>
           <section
             className="fertilizer-details-modal"
@@ -1088,6 +1089,8 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
                 })}
               </div>
             </div>
+          </section>
+        </div>
             <div className="fertilizer-details-actions fertilizer-details-actions--single">
               <button
                 className={`fertilizer-details-actions__change ${fertilizerIds.has(selectedLibraryPreset.id) ? 'fertilizer-details-actions__change--added' : ''}`}
@@ -1099,12 +1102,12 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
                 {fertilizerIds.has(selectedLibraryPreset.id) ? l('✓ Добавлено', '✓ Added') : l('Добавить', 'Add')}
               </button>
             </div>
-          </section>
-        </div>,
+        </>,
         document.body,
       ) : null}
 
       {selectedFertilizer ? createPortal(
+        <>
         <div className="fertilizer-tools-overlay fertilizer-tools-overlay--details" role="presentation" onClick={closeFertilizerDetails}>
           <section
             className="fertilizer-details-modal"
@@ -1161,6 +1164,8 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
                 })}
               </div>
             </div>
+          </section>
+        </div>
             <div className={`fertilizer-details-actions${selectedFertilizer.categoryId !== 'base' ? ' fertilizer-details-actions--single' : ''}`}>
               {selectedFertilizer.categoryId === 'base' ? (
                 <button
@@ -1202,8 +1207,7 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
                 </div>
               )}
             </div>
-          </section>
-        </div>,
+        </>,
         document.body,
       ) : null}
 

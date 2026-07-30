@@ -53,9 +53,9 @@ test('adds, marks, persists and removes an additive', async ({ page }) => {
   await dialog.getByRole('button', { name: 'Закрыть' }).click()
 
   await page.getByRole('button', { name: 'КалМаг Плюс' }).click()
-  const details = page.getByRole('dialog', { name: 'Карточка удобрения КалМаг Плюс' })
-  await details.getByRole('button', { name: 'Удалить добавку' }).click()
-  await details.getByRole('button', { name: 'Удалить', exact: true }).click()
+  await expect(page.getByRole('dialog', { name: 'Карточка удобрения КалМаг Плюс' })).toBeVisible()
+  await page.getByRole('button', { name: 'Удалить добавку' }).click()
+  await page.getByRole('button', { name: 'Удалить', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'КалМаг Плюс' })).toHaveCount(0)
 })
 
@@ -70,12 +70,13 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
   await page.getByRole('button', { name: 'Кокос A+B' }).click()
   const baseDetails = page.getByRole('dialog', { name: 'Карточка удобрения Кокос A+B' })
   if (testInfo.project.name.startsWith('mobile')) {
-    const geometry = await baseDetails.evaluate((modal) => {
-      const actions = modal.querySelector('.fertilizer-details-actions')
+    const geometry = await page.evaluate(() => {
+      const modal = document.querySelector('.fertilizer-details-modal')
+      const actions = document.querySelector('.fertilizer-details-actions')
       const actionButton = actions?.querySelector('button')
-      const content = modal.querySelector<HTMLElement>('.fertilizer-card__details')
+      const content = modal?.querySelector<HTMLElement>('.fertilizer-card__details')
       return {
-        actionGap: actions
+        actionGap: modal && actions
           ? Math.abs(modal.getBoundingClientRect().bottom - actions.getBoundingClientRect().bottom)
           : Number.POSITIVE_INFINITY,
         actionButtonBottomGap: actions && actionButton
@@ -97,9 +98,10 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
     const detailsContent = baseDetails.locator('.fertilizer-card__details')
     await detailsContent.evaluate((content) => { content.scrollTop = content.scrollHeight })
     await expect.poll(() => detailsContent.evaluate((content) => content.scrollTop)).toBeGreaterThan(0)
-    const bottomClearance = await baseDetails.evaluate((modal) => {
-      const content = modal.querySelector('.fertilizer-card__details')
-      const actions = modal.querySelector('.fertilizer-details-actions')
+    const bottomClearance = await page.evaluate(() => {
+      const modal = document.querySelector('.fertilizer-details-modal')
+      const content = modal?.querySelector('.fertilizer-card__details')
+      const actions = document.querySelector('.fertilizer-details-actions')
       const rows = content?.querySelectorAll('.fertilizer-dosage-table__row')
       const lastRow = rows?.item((rows?.length ?? 1) - 1)
       if (!content || !actions || !lastRow) return Number.NEGATIVE_INFINITY
@@ -108,7 +110,7 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
     })
     expect(bottomClearance).toBeGreaterThanOrEqual(16)
   }
-  await baseDetails.getByRole('button', { name: 'Сменить базу' }).click()
+  await page.getByRole('button', { name: 'Сменить базу' }).click()
   dialog = page.getByRole('dialog', { name: 'Добавление удобрений' })
   await dialog.getByRole('button', { name: /Simplex/ }).click()
   await dialog.getByRole('button', { name: 'Добавить ГидроВега A+B' }).click()

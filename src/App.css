@@ -3613,17 +3613,25 @@ body {
 }
 
 .fertilizer-details-actions {
-  position: sticky;
-  bottom: -1rem;
-  z-index: 5;
+  position: fixed;
+  inset: auto auto 1rem 50%;
+  z-index: 65;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.5rem;
-  margin: 0.2rem -1rem -1rem;
-  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--border);
+  width: min(680px, calc(100vw - 2rem));
+  margin: 0;
+  padding: 0.25rem;
+  border: 1px solid color-mix(in srgb, var(--border-strong) 88%, transparent);
+  border-radius: 22px;
   background: color-mix(in srgb, var(--surface) 94%, transparent);
-  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px -18px rgba(19, 35, 31, 0.58), 0 2px 8px rgba(19, 35, 31, 0.1);
+  backdrop-filter: blur(18px);
+  transform: translateX(-50%);
+}
+
+.fertilizer-details-modal .fertilizer-card__details {
+  padding-bottom: 5.5rem;
 }
 
 .fertilizer-details-actions__change,
@@ -3709,7 +3717,7 @@ body {
   }
 
   .fertilizer-details-modal {
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr);
     gap: 0;
     height: 100dvh;
     min-height: 100dvh;
@@ -3729,30 +3737,23 @@ body {
     background: var(--surface);
   }
 
-  .fertilizer-card__details {
+  .fertilizer-details-modal .fertilizer-card__details {
     align-content: start;
     grid-auto-rows: max-content;
     min-height: 0;
     margin-top: 0;
     overflow-x: visible;
     overflow-y: auto;
-    padding-bottom: 1.25rem;
-    scroll-padding-bottom: 1.25rem;
+    padding-bottom: 5rem;
+    scroll-padding-bottom: 5rem;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
 
   .fertilizer-details-actions {
-    position: relative;
-    inset: auto;
-    z-index: 2;
-    margin: 0.35rem -0.5rem -0.5rem;
-    padding: 0.25rem;
-    border: 1px solid color-mix(in srgb, var(--border-strong) 88%, transparent);
-    border-radius: 22px;
-    background: color-mix(in srgb, var(--surface) 94%, transparent);
-    box-shadow: 0 14px 34px -18px rgba(19, 35, 31, 0.58), 0 2px 8px rgba(19, 35, 31, 0.1);
-    backdrop-filter: blur(18px);
+    inset: auto max(0.5rem, env(safe-area-inset-right)) calc(0.35rem + var(--mobile-safe-bottom)) max(0.5rem, env(safe-area-inset-left));
+    width: auto;
+    transform: none;
   }
 
   .fertilizer-details-actions__change,
