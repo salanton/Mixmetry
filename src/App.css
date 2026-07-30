@@ -3751,10 +3751,6 @@ body {
     box-shadow: 0 -12px 28px -22px rgba(15, 23, 42, 0.7);
   }
 
-  html[data-standalone] .fertilizer-details-actions {
-    padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
-  }
-
   .fertilizer-dosage-table {
     width: 100%;
     min-width: 0;
