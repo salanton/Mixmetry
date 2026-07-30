@@ -708,6 +708,19 @@ function FertilizersPage() {
     closeAddFlow()
   }
 
+  const handleLibraryQuickToggle = (preset: (typeof FERTILIZER_LIBRARY)[number]) => {
+    if (preset.categoryId !== 'boosters') {
+      handleLibraryAdd(preset)
+      return
+    }
+
+    if (fertilizerIds.has(preset.id)) {
+      deleteFertilizer(preset.id)
+    } else {
+      addFromLibrary(preset)
+    }
+  }
+
   const confirmBaseLineReplacement = () => {
     if (!baseLineReplacement) return
 
@@ -909,12 +922,16 @@ function FertilizersPage() {
                             <button
                               className={`fertilizer-library__plus ${isAdded ? 'fertilizer-library__plus--added' : ''}`}
                               type="button"
-                              aria-label={isAdded ? l(`${preset.name} уже добавлено`, `${preset.name} already added`) : l(`Добавить ${preset.name}`, `Add ${preset.name}`)}
+                              aria-label={isAdded
+                                ? preset.categoryId === 'boosters'
+                                  ? l(`Убрать ${preset.name}`, `Remove ${preset.name}`)
+                                  : l(`${preset.name} уже добавлено`, `${preset.name} already added`)
+                                : l(`Добавить ${preset.name}`, `Add ${preset.name}`)}
                               aria-pressed={isAdded}
-                              disabled={isAdded}
+                              disabled={isAdded && preset.categoryId === 'base'}
                               onClick={(event) => {
                                 event.stopPropagation()
-                                handleLibraryAdd(preset)
+                                handleLibraryQuickToggle(preset)
                               }}
                             >
                               {isAdded ? '✓' : '+'}

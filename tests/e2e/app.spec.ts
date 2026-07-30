@@ -33,6 +33,13 @@ test('adds, marks, persists and removes an additive', async ({ page }) => {
   let dialog = page.getByRole('dialog', { name: 'Добавление удобрений' })
   await dialog.getByRole('button', { name: /Simplex/ }).click()
   await dialog.getByRole('button', { name: 'Добавить КалМаг Плюс' }).click()
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByRole('button', { name: 'Убрать КалМаг Плюс' })).toHaveAttribute('aria-pressed', 'true')
+  await dialog.getByRole('button', { name: 'Убрать КалМаг Плюс' }).click()
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByRole('button', { name: 'Добавить КалМаг Плюс' })).toHaveAttribute('aria-pressed', 'false')
+  await dialog.getByRole('button', { name: 'Добавить КалМаг Плюс' }).click()
+  await dialog.getByRole('button', { name: 'Закрыть' }).click()
 
   await expect(page.getByRole('heading', { name: 'КалМаг Плюс' })).toBeVisible()
   await page.reload()
@@ -42,7 +49,7 @@ test('adds, marks, persists and removes an additive', async ({ page }) => {
   await page.getByRole('button', { name: '+ Добавить удобрение' }).click()
   dialog = page.getByRole('dialog', { name: 'Добавление удобрений' })
   await dialog.getByRole('button', { name: /Simplex/ }).click()
-  await expect(dialog.getByRole('button', { name: 'КалМаг Плюс уже добавлено' })).toBeDisabled()
+  await expect(dialog.getByRole('button', { name: 'Убрать КалМаг Плюс' })).toHaveAttribute('aria-pressed', 'true')
   await dialog.getByRole('button', { name: 'Закрыть' }).click()
 
   await page.getByRole('button', { name: 'КалМаг Плюс' }).click()
