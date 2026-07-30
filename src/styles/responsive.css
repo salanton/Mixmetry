@@ -60,10 +60,6 @@
     grid-template-columns: minmax(40px, auto) 1fr 1fr;
   }
 
-  .stepper__controls {
-    grid-template-columns: 64px 1fr 64px;
-  }
-
   .reminder-button {
     width: 100%;
     justify-content: center;
@@ -223,4 +219,3 @@
 
 
 }
-

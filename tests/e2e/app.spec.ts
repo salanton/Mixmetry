@@ -239,6 +239,23 @@ test('reloads the installed application shell while offline', async ({ page, con
   await context.setOffline(false)
 })
 
+test('announces an activated PWA update', async ({ page }) => {
+  await page.reload()
+  await page.waitForFunction(async () => {
+    if (!('serviceWorker' in navigator)) return false
+    await navigator.serviceWorker.ready
+    return Boolean(navigator.serviceWorker.controller)
+  })
+  await page.reload()
+  await page.evaluate(() => {
+    navigator.serviceWorker.dispatchEvent(new Event('controllerchange'))
+  })
+
+  const notice = page.getByRole('status')
+  await expect(notice).toContainText('Доступна новая версия приложения.')
+  await expect(notice.getByRole('button', { name: 'Обновить' })).toBeVisible()
+})
+
 test('applies and persists language and theme preferences', async ({ page }) => {
   await page.getByRole('button', { name: 'Открыть настройки' }).click()
   const settings = page.getByRole('dialog', { name: 'Настройки' })

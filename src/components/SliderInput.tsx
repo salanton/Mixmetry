@@ -1,3 +1,5 @@
+import { useId } from 'react'
+
 type Props = {
   label?: string
   value: number
@@ -28,36 +30,35 @@ const SliderInput = ({
   const inputId = useId()
 
   return (
-  <div className={`slider${disabled ? ' slider--disabled' : ''}`}>
-    {showHeader ? (
-      <div className="slider__row">
-        {label ? <label className="input-label" htmlFor={inputId}>{label}</label> : <span aria-hidden="true" />}
-        <div className="slider__value">
-          {value.toFixed(step < 1 ? 1 : 0)}
-          {suffix ? ` ${suffix}` : ''}
+    <div className={`slider${disabled ? ' slider--disabled' : ''}`}>
+      {showHeader ? (
+        <div className="slider__row">
+          {label ? <label className="input-label" htmlFor={inputId}>{label}</label> : <span aria-hidden="true" />}
+          <div className="slider__value">
+            {value.toFixed(step < 1 ? 1 : 0)}
+            {suffix ? ` ${suffix}` : ''}
+          </div>
         </div>
-      </div>
-    ) : (
-      <div className="slider__value slider__value--standalone">
-        {displayValue ?? value.toFixed(step < 1 ? 1 : 0)}
-        {suffix && !displayValue ? ` ${suffix}` : ''}
-      </div>
-    )}
-    <input
-      id={inputId}
-      type="range"
-      aria-label={label ?? helper}
-      min={min}
-      max={max}
-      step={step}
-      value={value}
-      onChange={(e) => onChange(Number(e.target.value))}
-      disabled={disabled}
-    />
-    {helper ? <p className="input-helper slider__helper">{helper}</p> : null}
-  </div>
+      ) : (
+        <div className="slider__value slider__value--standalone">
+          {displayValue ?? value.toFixed(step < 1 ? 1 : 0)}
+          {suffix && !displayValue ? ` ${suffix}` : ''}
+        </div>
+      )}
+      <input
+        id={inputId}
+        type="range"
+        aria-label={label ?? helper}
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        disabled={disabled}
+      />
+      {helper ? <p className="input-helper slider__helper">{helper}</p> : null}
+    </div>
   )
 }
 
 export default SliderInput
-import { useId } from 'react'

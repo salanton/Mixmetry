@@ -49,73 +49,84 @@ type Action =
   | { type: 'set'; key: keyof Params; value: Params[keyof Params] }
   | { type: 'hydrate'; payload: Params }
 
-const isValidTime = (value: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(value)
+const isValidTime = (value: unknown): value is string =>
+  typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value)
+const finiteNumberOrDefault = (value: unknown, fallback: number) =>
+  typeof value === 'number' && Number.isFinite(value) ? value : fallback
+const booleanOrDefault = (value: unknown, fallback: boolean) =>
+  typeof value === 'boolean' ? value : fallback
 const isRecipeGrowMethodId = (value: unknown): value is GrowMethodId =>
   RECIPE_GROW_METHODS.includes(value as GrowMethodId)
 const isRecipePlantStageId = (value: unknown): value is PlantStageId =>
   RECIPE_PLANT_STAGES.includes(value as PlantStageId)
 
-export const sanitizeParams = (payload: Partial<Params>): Params => ({
-  lightHours: clamp(
-    payload.lightHours ?? DEFAULT_PARAMS.lightHours,
-    PARAM_LIMITS.lightHours.min,
-    PARAM_LIMITS.lightHours.max,
-  ),
-  // Флаг фиксирован в true: режим учитывается всегда как световое окно
-  onlyWhenLight: true,
-  correctWatering: Boolean(payload.correctWatering ?? DEFAULT_PARAMS.correctWatering),
-  unlimitedWaterings: Boolean(payload.unlimitedWaterings ?? DEFAULT_PARAMS.unlimitedWaterings),
-  showCompensatedDripsCard: Boolean(
-    payload.showCompensatedDripsCard ?? DEFAULT_PARAMS.showCompensatedDripsCard,
-  ),
-  showTankCard: Boolean(payload.showTankCard ?? DEFAULT_PARAMS.showTankCard),
-  tankVolumeLiters: clamp(
-    Math.round(payload.tankVolumeLiters ?? DEFAULT_PARAMS.tankVolumeLiters),
-    PARAM_LIMITS.tankVolumeLiters.min,
-    PARAM_LIMITS.tankVolumeLiters.max,
-  ),
-  recipeGrowMethodId: isRecipeGrowMethodId(payload.recipeGrowMethodId)
-    ? payload.recipeGrowMethodId
-    : DEFAULT_PARAMS.recipeGrowMethodId,
-  recipePlantStageId: isRecipePlantStageId(payload.recipePlantStageId)
-    ? payload.recipePlantStageId
-    : DEFAULT_PARAMS.recipePlantStageId,
-  dailyConsumptionLiters: clamp(
-    payload.dailyConsumptionLiters ?? DEFAULT_PARAMS.dailyConsumptionLiters,
-    PARAM_LIMITS.dailyConsumptionLiters.min,
-    PARAM_LIMITS.dailyConsumptionLiters.max,
-  ),
-  lampOnTime: isValidTime(payload.lampOnTime ?? '')
-    ? (payload.lampOnTime as string)
-    : DEFAULT_PARAMS.lampOnTime,
-  plantCount: clamp(
-    Math.round(payload.plantCount ?? DEFAULT_PARAMS.plantCount),
-    PARAM_LIMITS.plantCount.min,
-    PARAM_LIMITS.plantCount.max,
-  ),
-  dripRateLph: clamp(
-    payload.dripRateLph ?? DEFAULT_PARAMS.dripRateLph,
-    PARAM_LIMITS.dripRateLph.min,
-    PARAM_LIMITS.dripRateLph.max,
-  ),
-  dripCount: clamp(
-    Math.round(payload.dripCount ?? DEFAULT_PARAMS.dripCount),
-    PARAM_LIMITS.dripCount.min,
-    PARAM_LIMITS.dripCount.max,
-  ),
-  wateringsPerDay: clamp(
-    Math.round(payload.wateringsPerDay ?? DEFAULT_PARAMS.wateringsPerDay),
-    PARAM_LIMITS.wateringsPerDay.min,
-    (payload.unlimitedWaterings ?? DEFAULT_PARAMS.unlimitedWaterings)
-      ? PARAM_LIMITS.wateringsPerDay.max
-      : 4,
-  ),
-  durationMinutes: clamp(
-    Math.round(payload.durationMinutes ?? DEFAULT_PARAMS.durationMinutes),
-    PARAM_LIMITS.durationMinutes.min,
-    PARAM_LIMITS.durationMinutes.max,
-  ),
-})
+export const sanitizeParams = (payload: Partial<Params>): Params => {
+  const unlimitedWaterings = booleanOrDefault(
+    payload.unlimitedWaterings,
+    DEFAULT_PARAMS.unlimitedWaterings,
+  )
+
+  return {
+    lightHours: clamp(
+      finiteNumberOrDefault(payload.lightHours, DEFAULT_PARAMS.lightHours),
+      PARAM_LIMITS.lightHours.min,
+      PARAM_LIMITS.lightHours.max,
+    ),
+    // Флаг фиксирован в true: режим учитывается всегда как световое окно
+    onlyWhenLight: true,
+    correctWatering: booleanOrDefault(payload.correctWatering, DEFAULT_PARAMS.correctWatering),
+    unlimitedWaterings,
+    showCompensatedDripsCard: booleanOrDefault(
+      payload.showCompensatedDripsCard,
+      DEFAULT_PARAMS.showCompensatedDripsCard,
+    ),
+    showTankCard: booleanOrDefault(payload.showTankCard, DEFAULT_PARAMS.showTankCard),
+    tankVolumeLiters: clamp(
+      Math.round(finiteNumberOrDefault(payload.tankVolumeLiters, DEFAULT_PARAMS.tankVolumeLiters)),
+      PARAM_LIMITS.tankVolumeLiters.min,
+      PARAM_LIMITS.tankVolumeLiters.max,
+    ),
+    recipeGrowMethodId: isRecipeGrowMethodId(payload.recipeGrowMethodId)
+      ? payload.recipeGrowMethodId
+      : DEFAULT_PARAMS.recipeGrowMethodId,
+    recipePlantStageId: isRecipePlantStageId(payload.recipePlantStageId)
+      ? payload.recipePlantStageId
+      : DEFAULT_PARAMS.recipePlantStageId,
+    dailyConsumptionLiters: clamp(
+      finiteNumberOrDefault(payload.dailyConsumptionLiters, DEFAULT_PARAMS.dailyConsumptionLiters),
+      PARAM_LIMITS.dailyConsumptionLiters.min,
+      PARAM_LIMITS.dailyConsumptionLiters.max,
+    ),
+    lampOnTime: isValidTime(payload.lampOnTime)
+      ? payload.lampOnTime
+      : DEFAULT_PARAMS.lampOnTime,
+    plantCount: clamp(
+      Math.round(finiteNumberOrDefault(payload.plantCount, DEFAULT_PARAMS.plantCount)),
+      PARAM_LIMITS.plantCount.min,
+      PARAM_LIMITS.plantCount.max,
+    ),
+    dripRateLph: clamp(
+      finiteNumberOrDefault(payload.dripRateLph, DEFAULT_PARAMS.dripRateLph),
+      PARAM_LIMITS.dripRateLph.min,
+      PARAM_LIMITS.dripRateLph.max,
+    ),
+    dripCount: clamp(
+      Math.round(finiteNumberOrDefault(payload.dripCount, DEFAULT_PARAMS.dripCount)),
+      PARAM_LIMITS.dripCount.min,
+      PARAM_LIMITS.dripCount.max,
+    ),
+    wateringsPerDay: clamp(
+      Math.round(finiteNumberOrDefault(payload.wateringsPerDay, DEFAULT_PARAMS.wateringsPerDay)),
+      PARAM_LIMITS.wateringsPerDay.min,
+      unlimitedWaterings ? PARAM_LIMITS.wateringsPerDay.max : 4,
+    ),
+    durationMinutes: clamp(
+      Math.round(finiteNumberOrDefault(payload.durationMinutes, DEFAULT_PARAMS.durationMinutes)),
+      PARAM_LIMITS.durationMinutes.min,
+      PARAM_LIMITS.durationMinutes.max,
+    ),
+  }
+}
 
 const reducer = (state: Params, action: Action): Params => {
   switch (action.type) {

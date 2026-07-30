@@ -3,12 +3,17 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest run src",
-    "check": "npm run lint && npm test && npm run build",
+    "test:coverage": "vitest run src --coverage",
+    "check": "npm run lint && npm run test:coverage && npm run build",
     "test:e2e": "playwright test",
     "test:e2e:functional": "playwright test --grep-invert @visual",
     "test:e2e:visual": "playwright test tests/e2e/visual.spec.ts --project mobile-chromium",
@@ -21,20 +26,24 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
-    "@eslint/js": "^9.39.1",
-    "@playwright/test": "^1.62.0",
-    "@types/node": "^24.10.1",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^20.19.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
-    "eslint": "^9.39.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^10.8.0",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.8.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.48.0",
     "vite": "^7.3.6",
     "vite-plugin-pwa": "^1.3.0",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "jake": "12.10.1"
   }
 }
