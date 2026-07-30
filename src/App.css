@@ -3724,7 +3724,10 @@ body {
     max-height: 100dvh;
     overflow: hidden;
     padding-top: calc(1rem + env(safe-area-inset-top));
+    padding-bottom: 0;
+    border: 0;
     border-radius: 0;
+    box-shadow: none;
   }
 
   .fertilizer-details-modal > .fertilizer-tools__bar {
