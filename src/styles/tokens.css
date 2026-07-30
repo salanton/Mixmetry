@@ -1,7 +1,6 @@
 :root {
   --mobile-safe-bottom: min(env(safe-area-inset-bottom), 1rem);
   --ivory: #f4f7f6;
-  --light-gray: #d8e1de;
   --app-bg: var(--ivory);
   --surface: #ffffff;
   --surface-muted: #f8faf9;
@@ -22,9 +21,6 @@
   --success: #2f7d62;
   --success-soft: rgba(47, 125, 98, 0.11);
   --success-border: rgba(47, 125, 98, 0.34);
-  --cyan: var(--accent-strong);
-  --cyan-soft: var(--accent-soft);
-  --cyan-border: var(--accent-border);
   --warning: #a66a1f;
   --warning-soft: rgba(201, 133, 43, 0.12);
   --warning-border: rgba(201, 133, 43, 0.35);
@@ -39,12 +35,8 @@
   --shadow-panel: 0 24px 70px -30px rgba(19, 35, 31, 0.58);
   --radius-control: 10px;
   --radius-card: 16px;
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
 }
 
 :root[data-standalone][data-system-constrained] {
@@ -54,7 +46,6 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   --ivory: #0f1715;
-  --light-gray: #2b3a35;
   --app-bg: #0f1715;
   --surface: #17211e;
   --surface-muted: #1b2723;
