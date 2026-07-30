@@ -3747,7 +3747,12 @@ body {
     z-index: 2;
     margin: 0 -1rem -1rem;
     padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
+    padding-bottom: 0.35rem;
     box-shadow: 0 -12px 28px -22px rgba(15, 23, 42, 0.7);
+  }
+
+  html[data-standalone] .fertilizer-details-actions {
+    padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
   }
 
   .fertilizer-dosage-table {
@@ -4353,42 +4358,8 @@ body {
   }
 }
 
-/* Details actions stay attached to the viewport on every screen size. */
-.fertilizer-card__details {
-  padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));
-}
-
-.fertilizer-details-actions {
-  position: fixed;
-  inset: auto auto max(1rem, env(safe-area-inset-bottom)) 50%;
-  z-index: 80;
-  width: min(680px, calc(100vw - 2.5rem));
-  margin: 0;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border-strong);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  box-shadow: 0 16px 38px -24px rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(14px);
-  transform: translateX(-50%);
-}
-
 .fertilizer-details-actions__change--added {
   border: 1px solid var(--success-border);
   background: var(--success-soft);
   color: var(--success);
-}
-
-@media (max-width: 639px) {
-  .fertilizer-card__details {
-    padding-bottom: calc(9rem + env(safe-area-inset-bottom));
-  }
-
-  .fertilizer-details-actions {
-    inset: auto auto 0 50%;
-    width: 100%;
-    padding: 0.75rem max(1rem, env(safe-area-inset-right)) calc(0.75rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
-    border-width: 1px 0 0;
-    border-radius: 0;
-  }
 }

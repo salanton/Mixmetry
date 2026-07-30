@@ -72,10 +72,14 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
   if (testInfo.project.name.startsWith('mobile')) {
     const geometry = await baseDetails.evaluate((modal) => {
       const actions = modal.querySelector('.fertilizer-details-actions')
+      const actionButton = actions?.querySelector('button')
       const content = modal.querySelector<HTMLElement>('.fertilizer-card__details')
       return {
         actionGap: actions
           ? Math.abs(modal.getBoundingClientRect().bottom - actions.getBoundingClientRect().bottom)
+          : Number.POSITIVE_INFINITY,
+        actionButtonBottomGap: actions && actionButton
+          ? actions.getBoundingClientRect().bottom - actionButton.getBoundingClientRect().bottom
           : Number.POSITIVE_INFINITY,
         contentClientHeight: content?.clientHeight ?? 0,
         contentScrollHeight: content?.scrollHeight ?? 0,
@@ -83,6 +87,7 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
       }
     })
     expect(geometry.actionGap).toBeLessThanOrEqual(1)
+    expect(geometry.actionButtonBottomGap).toBeLessThan(8)
     expect(geometry.contentOverflowY).toBe('auto')
     expect(geometry.contentScrollHeight).toBeGreaterThan(geometry.contentClientHeight)
     const detailsContent = baseDetails.locator('.fertilizer-card__details')
