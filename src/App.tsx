@@ -1701,8 +1701,10 @@ function App() {
     track.style.transition = animate
       ? 'transform 380ms cubic-bezier(0.22, 0.92, 0.3, 1)'
       : 'none'
-    const viewportWidth = viewport.getBoundingClientRect().width
-    track.style.transform = `translate3d(${(-pageIndex * viewportWidth) + offset}px, 0, 0)`
+    const panel = track.children.item(pageIndex)
+    if (!(panel instanceof HTMLElement)) return
+    const pageOffset = panel.getBoundingClientRect().left - track.getBoundingClientRect().left
+    track.style.transform = `translate3d(${(-pageOffset) + offset}px, 0, 0)`
   }
 
   const resizeSwipeViewport = useCallback((height: number, animate = false) => {

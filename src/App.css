@@ -566,16 +566,18 @@ body {
 }
 
 .swipe-track {
+  --swipe-page-gap: 6px;
   display: flex;
   align-items: flex-start;
-  width: 300%;
+  gap: var(--swipe-page-gap);
+  width: calc(300% + (var(--swipe-page-gap) * 2));
   height: 100%;
   transform: translate3d(0, 0, 0);
   will-change: transform;
 }
 
 .swipe-panel {
-  flex: 0 0 calc(100% / 3);
+  flex: 0 0 calc((100% - (var(--swipe-page-gap) * 2)) / 3);
   height: max-content;
   min-width: 0;
 }
