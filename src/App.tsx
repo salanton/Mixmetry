@@ -5,6 +5,7 @@ import AppSettings from './components/AppSettings'
 import ControlCard from './components/ControlCard'
 import ControlsGrid from './components/ControlsGrid'
 import FertilizerDetailsModal from './components/FertilizerDetailsModal'
+import FertilizerLibraryDialog from './components/FertilizerLibraryDialog'
 import FertilizerShelf from './components/FertilizerShelf'
 import PageNavigation, { type PageId } from './components/PageNavigation'
 import SliderInput from './components/SliderInput'
@@ -14,7 +15,7 @@ import { PARAM_LIMITS, usePersistentParams } from './hooks/usePersistentParams'
 import { useModalAccessibility } from './hooks/useModalAccessibility'
 import type { FertilizerCategoryId, FertilizerComponent, FertilizerItem, PlantStageId } from './types'
 import CalculatorPage from './pages/CalculatorPage'
-import { METHOD_EN, getCategoryCopy, getFertilizerCopy, getStageDisplay } from './utils/fertilizerLocalization'
+import { METHOD_EN, getFertilizerCopy, getStageDisplay } from './utils/fertilizerLocalization'
 import mixmetryMark from './assets/mixmetry-mark.svg'
 import { useAppPreferences } from './contexts/AppPreferencesContext'
 import './App.css'
@@ -240,15 +241,6 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
 
   const selectedFertilizer = fertilizers.find((item) => item.id === selectedFertilizerId)
   const selectedLibraryPreset = FERTILIZER_LIBRARY.find((item) => item.id === selectedLibraryPresetId)
-  const categoryLibraryItems = FERTILIZER_LIBRARY.filter(
-    (item) => !addFlowCategoryId || item.categoryId === addFlowCategoryId,
-  )
-  const manufacturerOptions = Array.from(new Set(categoryLibraryItems.map((item) => item.manufacturer))).sort((a, b) =>
-    a.localeCompare(b, 'ru'),
-  )
-  const selectedManufacturerItems = selectedManufacturer
-    ? categoryLibraryItems.filter((item) => item.manufacturer === selectedManufacturer)
-    : []
   const baseFertilizers = fertilizers.filter((item) => item.categoryId === 'base')
   const currentBaseName = baseFertilizers[0]
     ? `${baseFertilizers[0].manufacturer} · ${baseFertilizers[0].name}`
@@ -418,126 +410,16 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
       aria-label={l('Удобрения', 'Nutrients')}
     >
       {addFlowCategoryId ? createPortal(
-        <div className="fertilizer-tools-overlay" role="presentation" onClick={closeAddFlow}>
-          <section
-            className="fertilizer-tools"
-            role="dialog"
-            aria-modal="true"
-            aria-label={l('Добавление удобрений', 'Add nutrients')}
-            tabIndex={-1}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="fertilizer-tools__bar">
-              <div>
-                <p className="fertilizer-tools__eyebrow">{l('Добавление', 'Add')}</p>
-                <h2>{addFlowCategoryId ? getCategoryCopy(addFlowCategoryId, language)?.title : l('Удобрение', 'Nutrient')}</h2>
-              </div>
-              <button className="fertilizer-tools__close" type="button" onClick={closeAddFlow} aria-label={l('Закрыть', 'Close')}>
-                ×
-              </button>
-            </div>
-
-            <section className="fertilizer-library" aria-labelledby="fertilizer-library-title">
-                <div className="fertilizer-form__header">
-                  <h2 id="fertilizer-library-title">
-                    {selectedManufacturer ?? l('Список производителей', 'Manufacturers')}
-                  </h2>
-                  <p>
-                    {selectedManufacturer
-                      ? l('Выберите удобрение этого производителя.', 'Choose a nutrient from this manufacturer.')
-                      : l('Сначала выберите производителя, потом конкретное удобрение.', 'Choose a manufacturer, then select a nutrient.')}
-                  </p>
-                </div>
-                {!selectedManufacturer ? (
-                  <div className="fertilizer-library__list">
-                    {manufacturerOptions.length > 0 ? (
-                      manufacturerOptions.map((manufacturer) => {
-                        const manufacturerItemsCount = categoryLibraryItems.filter(
-                          (item) => item.manufacturer === manufacturer,
-                        ).length
-
-                        return (
-                          <button
-                            className="fertilizer-library__item"
-                            key={manufacturer}
-                            type="button"
-                            onClick={() => setSelectedManufacturer(manufacturer)}
-                          >
-                            <span>
-                              <strong>{manufacturer}</strong>
-                              <small>{manufacturerItemsCount} {l('поз.', 'items')}</small>
-                            </span>
-                            <span className="fertilizer-library__plus">→</span>
-                          </button>
-                        )
-                      })
-                    ) : (
-                      <p className="fertilizer-library__empty">{l('Для этой категории все шаблоны уже добавлены.', 'All available items in this category have already been added.')}</p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="fertilizer-library__list">
-                    {selectedManufacturerItems.length > 0 ? (
-                      selectedManufacturerItems.map((preset) => {
-                        const isAdded = fertilizerIds.has(preset.id)
-
-                        return (
-                          <article
-                            className={`fertilizer-library__card ${isAdded ? 'fertilizer-library__card--added' : ''}`}
-                            key={preset.id}
-                          >
-                            <button
-                              className="fertilizer-library__preview"
-                              type="button"
-                              aria-haspopup="dialog"
-                              onClick={() => setSelectedLibraryPresetId(preset.id)}
-                            >
-                              <span>
-                                <strong>{preset.name}</strong>
-                                <small>{preset.manufacturer} · {getFertilizerCopy(preset, language).shortDescription}</small>
-                              </span>
-                            </button>
-                            <button
-                              className={`fertilizer-library__plus ${isAdded ? 'fertilizer-library__plus--added' : ''}`}
-                              type="button"
-                              aria-label={isAdded
-                                ? preset.categoryId === 'boosters'
-                                  ? l(`Убрать ${preset.name}`, `Remove ${preset.name}`)
-                                  : l(`${preset.name} уже добавлено`, `${preset.name} already added`)
-                                : l(`Добавить ${preset.name}`, `Add ${preset.name}`)}
-                              aria-pressed={isAdded}
-                              disabled={isAdded && preset.categoryId === 'base'}
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                handleLibraryQuickToggle(preset)
-                              }}
-                            >
-                              {isAdded ? '✓' : '+'}
-                            </button>
-                          </article>
-                        )
-                      })
-                    ) : (
-                      <p className="fertilizer-library__empty">{l('У этого производителя все шаблоны уже добавлены.', 'All available items from this manufacturer have already been added.')}</p>
-                    )}
-                  </div>
-                )}
-                <button
-                  className="fertilizer-flow-actions__secondary"
-                  type="button"
-                  onClick={() => {
-                    if (selectedManufacturer) {
-                      setSelectedManufacturer(null)
-                    } else {
-                      closeAddFlow()
-                    }
-                  }}
-                >
-                  {l('Назад', 'Back')}
-                </button>
-            </section>
-          </section>
-        </div>,
+        <FertilizerLibraryDialog
+          categoryId={addFlowCategoryId}
+          language={language}
+          selectedManufacturer={selectedManufacturer}
+          fertilizerIds={fertilizerIds}
+          onClose={closeAddFlow}
+          onSelectManufacturer={setSelectedManufacturer}
+          onPreview={setSelectedLibraryPresetId}
+          onQuickToggle={handleLibraryQuickToggle}
+        />,
         document.body,
       ) : null}
 
