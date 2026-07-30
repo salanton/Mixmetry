@@ -14,9 +14,24 @@ import { FERTILIZER_LIBRARY, GROW_METHODS, PLANT_STAGES } from './data/fertilize
 import { usePersistentFertilizers } from './hooks/usePersistentFertilizers'
 import { PARAM_LIMITS, usePersistentParams } from './hooks/usePersistentParams'
 import { useModalAccessibility } from './hooks/useModalAccessibility'
-import type { FertilizerCategoryId, FertilizerComponent, FertilizerItem, PlantStageId } from './types'
+import type { FertilizerCategoryId, FertilizerItem } from './types'
 import CalculatorPage from './pages/CalculatorPage'
 import { METHOD_EN, getFertilizerCopy, getStageDisplay } from './utils/fertilizerLocalization'
+import {
+  formatBaseComponentCount,
+  formatFertilizerBadge,
+  formatRecipeDosage,
+  formatRecipeFoliarDose,
+  formatRecipePerLiterValue,
+  formatRecipeTotalValue,
+  formatStageDosage,
+  formatStageDosageTotal,
+  getRecipeRowName,
+  getStageAmount,
+  groupRecipeRowsByManufacturer,
+  localizeDosageText,
+  type RecipeRow,
+} from './utils/fertilizerDosage'
 import mixmetryMark from './assets/mixmetry-mark.svg'
 import { useAppPreferences } from './contexts/AppPreferencesContext'
 import './App.css'
@@ -39,185 +54,8 @@ const SWIPE_BLOCK_SELECTOR = [
   '.app-settings-overlay',
   '[data-horizontal-scroll]',
 ].join(',')
-type RecipeRow = {
-  fertilizer: FertilizerItem
-  component?: FertilizerComponent
-  amountMlPerLiter: number
-  amountTotal: number
-}
 type PersistentParams = ReturnType<typeof usePersistentParams>
 type PersistentFertilizers = ReturnType<typeof usePersistentFertilizers>
-
-const formatMlValue = (value: number) => {
-  const rounded = Number(value.toFixed(2))
-  return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(2)} мл`
-}
-
-const formatDosageNumber = (value: number) => {
-  const rounded = Number(value.toFixed(2))
-  return Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(2)
-}
-
-const getDosageUnit = (label?: string) => {
-  if (!label) return 'мл'
-  return /(?:^|[\s\d,.])(?:g|gr|г)\s*(?:\/|$)/i.test(label) ? 'г' : 'мл'
-}
-
-const formatDosagePerLiter = (value: number, label?: string) => {
-  if (label && /(?:\/\s*(?:l|л|10l|10л)|mL\/L|мл\/л|g\/L|gr\/L|г\/л)/i.test(label)) return label
-  return `${label ?? formatDosageNumber(value)} мл/л`
-}
-
-const getDosageRangeValues = (label?: string) => {
-  if (!label?.includes('-')) return null
-
-  const values = label
-    .replace(',', '.')
-    .split('-')
-    .map((value) => Number.parseFloat(value.trim()))
-    .filter((value) => Number.isFinite(value))
-
-  return values.length >= 2 ? values : null
-}
-
-const formatFertilizerBadge = (name: string) => {
-  const hasPlusSuffix = /(?:\bplus\b|плюс)/iu.test(name)
-  const nameWithoutPlus = name.replace(/(?:\bplus\b|плюс)/giu, '').trim()
-  const lettersOnly = [...nameWithoutPlus.matchAll(/\p{L}/gu)].map(([letter]) => letter).join('')
-  const isAllCapsName = lettersOnly.length > 1 && lettersOnly === lettersOnly.toLocaleUpperCase()
-  const uppercaseLetters = [...nameWithoutPlus.matchAll(/\p{Lu}/gu)].map(([letter]) => letter)
-  const badgeText = isAllCapsName
-    ? (nameWithoutPlus || name).slice(0, 2)
-    : uppercaseLetters.length > 1
-    ? uppercaseLetters.join('')
-    : (nameWithoutPlus || name).slice(0, 2)
-
-  return `${badgeText}${hasPlusSuffix ? '+' : ''}`
-}
-
-const formatBaseComponentCount = (fertilizer?: FertilizerItem) => {
-  if (!fertilizer) return '—'
-  if (!fertilizer.components?.length) return '1x'
-
-  const usageGroups = fertilizer.components.reduce<Map<string, number>>((groups, component) => {
-    const stageSignature = PLANT_STAGES.map((stage) => {
-      const dosage = getStageDosage(fertilizer, stage.id, fertilizer.growMethodId, component)
-      return dosage?.amountMlPerLiter !== null && dosage?.amountMlPerLiter !== undefined ? '1' : '0'
-    }).join('')
-
-    groups.set(stageSignature, (groups.get(stageSignature) ?? 0) + 1)
-    return groups
-  }, new Map())
-
-  return [...usageGroups.values()].map((count) => `${count}x`).join('+')
-}
-
-const getStageDosage = (
-  fertilizer: FertilizerItem,
-  stageId: PlantStageId,
-  growMethodId?: FertilizerItem['growMethodId'],
-  component?: FertilizerComponent,
-) =>
-  (growMethodId && growMethodId !== 'any' ? component?.methodStageDosages?.[growMethodId] : undefined)
-    ?.find((dosage) => dosage.stageId === stageId)
-    ?? component?.stageDosages.find((dosage) => dosage.stageId === stageId)
-    ?? (growMethodId && growMethodId !== 'any' ? fertilizer.methodStageDosages?.[growMethodId] : undefined)
-    ?.find((dosage) => dosage.stageId === stageId)
-    ?? fertilizer.stageDosages.find((dosage) => dosage.stageId === stageId)
-
-const getStageAmount = (
-  fertilizer: FertilizerItem,
-  stageId: PlantStageId,
-  growMethodId?: FertilizerItem['growMethodId'],
-  component?: FertilizerComponent,
-) =>
-  getStageDosage(fertilizer, stageId, growMethodId, component)?.amountMlPerLiter ?? null
-
-const formatStageDosage = (fertilizer: FertilizerItem, stageId: PlantStageId) => {
-  const dosage = getStageDosage(fertilizer, stageId)
-  if (!dosage || dosage.amountMlPerLiter === null) return '—'
-  return formatDosagePerLiter(dosage.amountMlPerLiter, dosage.amountLabel)
-}
-
-const formatRecipeDosage = (
-  fertilizer: FertilizerItem,
-  stageId: PlantStageId,
-  growMethodId?: FertilizerItem['growMethodId'],
-  component?: FertilizerComponent,
-) => {
-  const dosage = getStageDosage(fertilizer, stageId, growMethodId, component)
-  if (!dosage || dosage.amountMlPerLiter === null) return '—'
-  return formatDosagePerLiter(dosage.amountMlPerLiter, dosage.amountLabel)
-}
-
-const formatRecipeFoliarDose = (dose?: string) =>
-  dose
-    ? dose
-        .replace(/\s*капли\s*/i, ' ')
-        .replace(/\s*\/\s*/g, ' /')
-        .trim()
-    : '—'
-
-const localizeDosageText = (value: string, language: 'ru' | 'en') => {
-  if (language === 'ru') return value
-  return value
-    .replace(/мл\/л/giu, 'mL/L')
-    .replace(/г\/л/giu, 'g/L')
-    .replace(/мл/giu, 'mL')
-    .replace(/(?:ст\.\s*)?ложки/giu, 'tbsp')
-    .replace(/капли?/giu, 'drops')
-    .replace(/субстрата/giu, 'of substrate')
-    .replace(/раствора/giu, 'of solution')
-    .replace(/при смене раствора/giu, 'per solution change')
-    .replace(/\bл\b/giu, 'L')
-}
-
-const formatRecipePerLiterValue = (value: string, language: 'ru' | 'en') =>
-  localizeDosageText(value, language)
-    .replace(/\s*мл\/л/giu, '')
-    .replace(/\s*г\/л/giu, '')
-    .replace(/\s*mL\/L/giu, '')
-    .replace(/\s*g\/L/giu, '')
-
-const formatRecipeTotalValue = (value: string, language: 'ru' | 'en') =>
-  localizeDosageText(value, language)
-    .replace(/\s*мл/giu, '')
-    .replace(/\s*mL/giu, '')
-
-const formatStageDosageTotal = (
-  fertilizer: FertilizerItem,
-  stageId: PlantStageId,
-  waterVolumeLiters: number,
-  growMethodId?: FertilizerItem['growMethodId'],
-  component?: FertilizerComponent,
-) => {
-  const dosage = getStageDosage(fertilizer, stageId, growMethodId, component)
-  if (!dosage || dosage.amountMlPerLiter === null) return '—'
-  const unit = getDosageUnit(dosage.amountLabel)
-
-  const values = getDosageRangeValues(dosage.amountLabel)
-  if (values) {
-    return `${formatDosageNumber(values[0] * waterVolumeLiters)}-${formatDosageNumber(values[1] * waterVolumeLiters)} ${unit}`
-  }
-
-  return unit === 'мл'
-    ? formatMlValue(dosage.amountMlPerLiter * waterVolumeLiters)
-    : `${formatDosageNumber(dosage.amountMlPerLiter * waterVolumeLiters)} ${unit}`
-}
-
-const getRecipeRowName = (row: RecipeRow) =>
-  row.component?.name ?? row.fertilizer.name
-
-const groupRecipeRowsByManufacturer = (rows: RecipeRow[]) => {
-  const groups = new Map<string, RecipeRow[]>()
-
-  rows.forEach((row) => {
-    const manufacturer = row.fertilizer.manufacturer || 'Без производителя'
-    groups.set(manufacturer, [...(groups.get(manufacturer) ?? []), row])
-  })
-
-  return Array.from(groups, ([manufacturer, items]) => ({ manufacturer, items }))
-}
 
 function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFertilizers }) {
   const { language } = useAppPreferences()
