@@ -309,10 +309,15 @@ const localizeDosageText = (value: string, language: 'ru' | 'en') => {
 
 const formatRecipePerLiterValue = (value: string, language: 'ru' | 'en') =>
   localizeDosageText(value, language)
-    .replace(/мл\/л/giu, 'мл')
-    .replace(/г\/л/giu, 'г')
-    .replace(/mL\/L/giu, 'mL')
-    .replace(/g\/L/giu, 'g')
+    .replace(/\s*мл\/л/giu, '')
+    .replace(/\s*г\/л/giu, '')
+    .replace(/\s*mL\/L/giu, '')
+    .replace(/\s*g\/L/giu, '')
+
+const formatRecipeTotalValue = (value: string, language: 'ru' | 'en') =>
+  localizeDosageText(value, language)
+    .replace(/\s*мл/giu, '')
+    .replace(/\s*mL/giu, '')
 
 const formatStageDosageTotal = (
   fertilizer: FertilizerItem,
@@ -1551,7 +1556,7 @@ function RecipePage({
             <h3 id="recipe-base-title">{l('База', 'Base nutrients')}</h3>
             <div className="recipe-table__head">
               <span>{l('Удобрение', 'Nutrient')}</span>
-              <span>{l('На 1л', 'Per 1 L')}</span>
+              <span>{l('мл/л', 'mL/L')}</span>
               <span>{l(`На ${waterVolumeLiters}л`, `Per ${waterVolumeLiters} L`)}</span>
             </div>
             {baseRecipeGroups.length > 0 ? (
@@ -1562,7 +1567,7 @@ function RecipePage({
                     <div className="recipe-table__row" key={`${row.fertilizer.id}-${row.component?.id ?? 'main'}`}>
                       <strong>{getRecipeRowName(row)}</strong>
                       <span>{formatRecipePerLiterValue(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
-                      <span>{localizeDosageText(formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component), language)}</span>
+                      <span>{formatRecipeTotalValue(formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component), language)}</span>
                     </div>
                   ))}
                 </div>
@@ -1576,7 +1581,7 @@ function RecipePage({
             <h3 id="recipe-root-title">{l('Добавки под корень', 'Root supplements')}</h3>
             <div className="recipe-table__head">
               <span>{l('Добавка', 'Supplement')}</span>
-              <span>{l('На 1л', 'Per 1 L')}</span>
+              <span>{l('мл/л', 'mL/L')}</span>
               <span>{l(`На ${waterVolumeLiters}л`, `Per ${waterVolumeLiters} L`)}</span>
             </div>
             {rootAdditiveGroups.length > 0 ? (
@@ -1587,7 +1592,7 @@ function RecipePage({
                     <div className="recipe-table__row" key={`${row.fertilizer.id}-${row.component?.id ?? 'main'}`}>
                       <strong>{getRecipeRowName(row)}</strong>
                       <span>{formatRecipePerLiterValue(formatRecipeDosage(row.fertilizer, plantStageId, growMethodId, row.component), language)}</span>
-                      <span>{localizeDosageText(formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component), language)}</span>
+                      <span>{formatRecipeTotalValue(formatStageDosageTotal(row.fertilizer, plantStageId, waterVolumeLiters, growMethodId, row.component), language)}</span>
                     </div>
                   ))}
                 </div>
@@ -1602,7 +1607,7 @@ function RecipePage({
             <div className="recipe-table__head recipe-table__head--foliar">
               <span>{l('Добавка', 'Supplement')}</span>
               <span>{l('Капли', 'Drops')}</span>
-              <span>{l('На 1л', 'Per 1 L')}</span>
+              <span>{l('мл/л', 'mL/L')}</span>
             </div>
             {foliarAdditiveGroups.length > 0 ? (
               foliarAdditiveGroups.map((group) => (
