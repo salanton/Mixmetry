@@ -8,7 +8,7 @@ const screenshotOptions = {
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('dripcalc:install-hint-dismissed', '1')
+    localStorage.setItem('mixmetry:install-hint-dismissed', '1')
   })
   await page.goto('./')
 })

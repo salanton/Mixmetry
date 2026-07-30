@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useAppPreferences } from '../contexts/AppPreferencesContext'
+import { LEGACY_STORAGE_KEYS, STORAGE_KEYS, readMigratedStorage } from '../utils/storage'
 
-const STORAGE_KEY = 'dripcalc:install-hint-dismissed'
+const STORAGE_KEY = STORAGE_KEYS.installHintDismissed
 
 const isInstalledPwa = () => window.matchMedia('(display-mode: standalone)').matches
   || Boolean((navigator as Navigator & { standalone?: boolean }).standalone)
@@ -36,7 +37,7 @@ const InstallHint = () => {
   const [visible, setVisible] = useState(() => {
     if (!isMobileBrowser() || isInstalledPwa()) return false
     try {
-      return !localStorage.getItem(STORAGE_KEY)
+      return !readMigratedStorage(STORAGE_KEY, LEGACY_STORAGE_KEYS.installHintDismissed)
     } catch {
       return true
     }

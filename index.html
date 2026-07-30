@@ -15,7 +15,11 @@
     <meta name="application-name" content="Mixmetry" />
     <script>
       try {
-        const saved = JSON.parse(localStorage.getItem('dripcalc:preferences:v1') || '{}')
+        const currentKey = 'mixmetry:preferences:v1'
+        const legacyKey = 'dripcalc:preferences:v1'
+        const stored = localStorage.getItem(currentKey) || localStorage.getItem(legacyKey)
+        if (stored && !localStorage.getItem(currentKey)) localStorage.setItem(currentKey, stored)
+        const saved = JSON.parse(stored || '{}')
         const dark = saved.theme === 'dark'
           || (saved.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
         document.documentElement.dataset.theme = dark ? 'dark' : 'light'

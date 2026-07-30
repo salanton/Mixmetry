@@ -51,7 +51,7 @@ const pwa = VitePWA({
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/DripCalc/',
+  base: '/Mixmetry/',
   plugins: [react(), pwa],
   server: {
     host: '0.0.0.0', // Доступ по IP адресу

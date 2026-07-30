@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { LEGACY_STORAGE_KEYS, STORAGE_KEYS, readMigratedStorage } from '../utils/storage'
 
 export type AppLanguage = 'ru' | 'en'
 export type ThemePreference = 'system' | 'light' | 'dark'
@@ -88,7 +89,7 @@ type AppPreferencesContextValue = {
   t: (key: TranslationKey) => string
 }
 
-const STORAGE_KEY = 'dripcalc:preferences:v1'
+const STORAGE_KEY = STORAGE_KEYS.preferences
 const AppPreferencesContext = createContext<AppPreferencesContextValue | null>(null)
 
 const getDeviceLanguage = (): AppLanguage =>
@@ -100,7 +101,7 @@ const getSystemTheme = (): 'light' | 'dark' =>
 const readPreferences = () => {
   const fallback = { language: getDeviceLanguage(), theme: 'system' as ThemePreference }
   try {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
+    const stored = readMigratedStorage(STORAGE_KEY, LEGACY_STORAGE_KEYS.preferences)
     if (!stored) return fallback
     const parsed = JSON.parse(stored) as Partial<typeof fallback>
     return {

@@ -7,7 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: 'list',
   use: {
-    baseURL: 'http://127.0.0.1:4173/DripCalc/',
+    baseURL: 'http://127.0.0.1:4173/Mixmetry/',
     locale: 'ru-RU',
     trace: 'retain-on-failure',
   },
@@ -23,7 +23,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4173',
-    url: 'http://127.0.0.1:4173/DripCalc/',
+    url: 'http://127.0.0.1:4173/Mixmetry/',
     reuseExistingServer: false,
     timeout: 120_000,
   },

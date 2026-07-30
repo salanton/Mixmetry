@@ -1,8 +1,9 @@
 import { useEffect, useReducer, useState } from 'react'
 import type { GrowMethodId, Params, PlantStageId } from '../types'
 import { clamp } from '../utils/calculations'
+import { LEGACY_STORAGE_KEYS, STORAGE_KEYS, readMigratedStorage } from '../utils/storage'
 
-export const STORAGE_KEY = 'dripcalc:params:v2'
+export const STORAGE_KEY = STORAGE_KEYS.params
 const RECIPE_GROW_METHODS: GrowMethodId[] = ['hydro', 'coco', 'soil']
 const RECIPE_PLANT_STAGES: PlantStageId[] = [
   'seedling',
@@ -133,7 +134,7 @@ export const usePersistentParams = () => {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY)
+      const raw = readMigratedStorage(STORAGE_KEY, LEGACY_STORAGE_KEYS.params)
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<Params>
         dispatch({ type: 'hydrate', payload: sanitizeParams(parsed) })

@@ -184,7 +184,7 @@ test('persists calculator settings after reload', async ({ page }) => {
 })
 
 test('recovers from corrupted saved settings', async ({ page }) => {
-  await page.evaluate(() => localStorage.setItem('dripcalc:params:v2', '{broken json'))
+  await page.evaluate(() => localStorage.setItem('mixmetry:params:v2', '{broken json'))
   await page.reload()
 
   await expect(page.getByRole('button', { name: 'Полив' })).toHaveAttribute('aria-current', 'page')

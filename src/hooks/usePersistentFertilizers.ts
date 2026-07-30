@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DEFAULT_FERTILIZERS, FERTILIZER_LIBRARY } from '../data/fertilizerLibrary'
 import type { FertilizerItem } from '../types'
+import { LEGACY_STORAGE_KEYS, STORAGE_KEYS, readMigratedStorage } from '../utils/storage'
 
-const STORAGE_KEY = 'dripcalc:fertilizers:v1'
+const STORAGE_KEY = STORAGE_KEYS.fertilizers
 
 const REPLACED_LIBRARY_IDS: Record<string, string> = {
   'simplex-hydro-vega-a': 'simplex-hydro-vega-ab',
@@ -49,7 +50,7 @@ export const sanitizeFertilizers = (payload: unknown): FertilizerItem[] => {
 
 const readStoredFertilizers = (): FertilizerItem[] => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = readMigratedStorage(STORAGE_KEY, LEGACY_STORAGE_KEYS.fertilizers)
     return raw ? sanitizeFertilizers(JSON.parse(raw)) : DEFAULT_FERTILIZERS
   } catch {
     return DEFAULT_FERTILIZERS
