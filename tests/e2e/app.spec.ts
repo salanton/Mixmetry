@@ -70,12 +70,24 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
   await page.getByRole('button', { name: 'Кокос A+B' }).click()
   const baseDetails = page.getByRole('dialog', { name: 'Карточка удобрения Кокос A+B' })
   if (testInfo.project.name.startsWith('mobile')) {
-    const actionGap = await baseDetails.evaluate((modal) => {
+    const geometry = await baseDetails.evaluate((modal) => {
       const actions = modal.querySelector('.fertilizer-details-actions')
-      if (!actions) return Number.POSITIVE_INFINITY
-      return Math.abs(modal.getBoundingClientRect().bottom - actions.getBoundingClientRect().bottom)
+      const content = modal.querySelector<HTMLElement>('.fertilizer-card__details')
+      return {
+        actionGap: actions
+          ? Math.abs(modal.getBoundingClientRect().bottom - actions.getBoundingClientRect().bottom)
+          : Number.POSITIVE_INFINITY,
+        contentClientHeight: content?.clientHeight ?? 0,
+        contentScrollHeight: content?.scrollHeight ?? 0,
+        contentOverflowY: content ? getComputedStyle(content).overflowY : '',
+      }
     })
-    expect(actionGap).toBeLessThanOrEqual(1)
+    expect(geometry.actionGap).toBeLessThanOrEqual(1)
+    expect(geometry.contentOverflowY).toBe('auto')
+    expect(geometry.contentScrollHeight).toBeGreaterThan(geometry.contentClientHeight)
+    const detailsContent = baseDetails.locator('.fertilizer-card__details')
+    await detailsContent.evaluate((content) => { content.scrollTop = content.scrollHeight })
+    await expect.poll(() => detailsContent.evaluate((content) => content.scrollTop)).toBeGreaterThan(0)
   }
   await baseDetails.getByRole('button', { name: 'Сменить базу' }).click()
   dialog = page.getByRole('dialog', { name: 'Добавление удобрений' })

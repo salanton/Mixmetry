@@ -3728,6 +3728,8 @@ body {
   }
 
   .fertilizer-card__details {
+    align-content: start;
+    grid-auto-rows: max-content;
     min-height: 0;
     margin-top: 0;
     overflow-x: visible;
