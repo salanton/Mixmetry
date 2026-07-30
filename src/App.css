@@ -3747,6 +3747,7 @@ body {
     z-index: 2;
     margin: 0 -1rem -1rem;
     padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
+    padding-top: 0.35rem;
     padding-bottom: 0.35rem;
     box-shadow: 0 -12px 28px -22px rgba(15, 23, 42, 0.7);
   }

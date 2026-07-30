@@ -81,6 +81,9 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
         actionButtonBottomGap: actions && actionButton
           ? actions.getBoundingClientRect().bottom - actionButton.getBoundingClientRect().bottom
           : Number.POSITIVE_INFINITY,
+        actionButtonTopGap: actions && actionButton
+          ? actionButton.getBoundingClientRect().top - actions.getBoundingClientRect().top
+          : Number.POSITIVE_INFINITY,
         contentClientHeight: content?.clientHeight ?? 0,
         contentScrollHeight: content?.scrollHeight ?? 0,
         contentOverflowY: content ? getComputedStyle(content).overflowY : '',
@@ -88,6 +91,7 @@ test('selects and replaces a base line and updates the recipe', async ({ page },
     })
     expect(geometry.actionGap).toBeLessThanOrEqual(1)
     expect(geometry.actionButtonBottomGap).toBeLessThan(8)
+    expect(Math.abs(geometry.actionButtonTopGap - geometry.actionButtonBottomGap)).toBeLessThanOrEqual(1)
     expect(geometry.contentOverflowY).toBe('auto')
     expect(geometry.contentScrollHeight).toBeGreaterThan(geometry.contentClientHeight)
     const detailsContent = baseDetails.locator('.fertilizer-card__details')
