@@ -571,27 +571,6 @@
   font-weight: 800;
 }
 
-.fertilizer-card__add {
-  justify-self: start;
-  min-height: 38px;
-  border-radius: 10px;
-  padding: 0.55rem 0.85rem;
-  background: var(--action);
-  color: var(--surface);
-  font-weight: 900;
-}
-
-.fertilizer-card__add--added {
-  border: 1px solid var(--success-border);
-  background: var(--success-soft);
-  color: var(--success);
-}
-
-.fertilizer-card__add:disabled {
-  cursor: default;
-  opacity: 1;
-}
-
 .fertilizer-card--empty {
   grid-template-columns: auto;
   grid-template-rows: auto auto;

@@ -1,9 +1,4 @@
 /* Typography and density layer */
-.topbar__subtitle {
-  margin: 0.08rem 0 0;
-  color: var(--text-muted);
-  line-height: 1.25;
-}
 
 .control-card__title {
   margin: 0;
@@ -271,10 +266,6 @@
 
   .topbar__heading {
     flex: 1 1 auto;
-  }
-
-  .topbar__subtitle {
-    display: none;
   }
 
   .topbar__actions {

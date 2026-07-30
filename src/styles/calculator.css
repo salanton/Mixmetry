@@ -28,28 +28,6 @@
   color: var(--text-muted);
 }
 
-.summary__row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.summary__label {
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.summary__value {
-  font-weight: 700;
-  color: var(--text);
-}
-
-.summary__muted {
-  color: var(--text-soft);
-  font-weight: 500;
-}
-
 .bento-grid,
 .controls-grid {
   container-type: inline-size;
@@ -162,32 +140,6 @@
   margin: 0;
   color: var(--text-soft);
   font-size: 0.9rem;
-}
-
-.time-input {
-  width: 100%;
-  border: 1px solid var(--border);
-  background: var(--surface-muted);
-  border-radius: 12px;
-  padding: 12px;
-  height: 48px;
-  color: var(--text);
-  text-align: center;
-  margin-bottom: 0.45rem;
-}
-
-.time-input::-webkit-datetime-edit {
-  text-align: center;
-}
-
-.time-input::-webkit-datetime-edit-fields-wrapper {
-  display: flex;
-  justify-content: center;
-}
-
-.time-input:focus {
-  outline: 2px solid var(--accent-border);
-  border-color: var(--accent-border);
 }
 
 .slider {
@@ -381,30 +333,9 @@
   text-align: center;
 }
 
-.preset-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.5rem;
-  width: 100%;
-  justify-items: center;
-  align-items: stretch;
-  margin-top: 0.35rem;
-}
-
-.control-divider {
-  width: 100%;
-  height: 1px;
-  background: var(--border);
-  margin: 0.4rem 0 0.15rem;
-}
-
 .control-card--mode .control-card__body {
   gap: 0.4rem;
   margin-top: 0.5rem;
-}
-
-.control-card--start .control-card__body {
-  justify-content: space-between;
 }
 
 .control-card--waterings .control-card__body {
@@ -626,13 +557,5 @@
 .text-btn {
   color: var(--accent-strong);
   font-weight: 600;
-}
-
-.formula-list {
-  margin: 0.2rem 0 0;
-  padding-left: 1.2rem;
-  color: var(--text);
-  display: grid;
-  gap: 0.3rem;
 }
 

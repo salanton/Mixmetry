@@ -98,11 +98,6 @@
   padding-block: var(--space-3) var(--space-4);
 }
 
-.topbar__subtitle {
-  margin-top: 0.1rem;
-  letter-spacing: 0.01em;
-}
-
 .mobile-nav-dock {
   display: none;
 }
@@ -114,7 +109,6 @@
 
 .control-card__title,
 .fertilizer-category__title,
-.schedule-card__title,
 .recipe-result__header h2 {
   color: var(--text);
   font-weight: 820;
@@ -148,7 +142,6 @@
 .fertilizer-library__item:focus-visible,
 .fertilizer-library__preview:focus-visible,
 .fertilizer-card__main:focus-visible,
-.fertilizer-card__add:focus-visible,
 .fertilizer-flow-actions__secondary:focus-visible,
 .reminder-button:focus-visible,
 .stepper__btn:focus-visible,
@@ -297,7 +290,6 @@
 .fertilizer-tools__close:focus-visible,
 .fertilizer-library__card:focus-visible,
 .fertilizer-card__main:focus-visible,
-.fertilizer-card__add:focus-visible,
 .fertilizer-flow-actions__secondary:focus-visible,
 .reminder-button:focus-visible,
 .stepper__btn:focus-visible,

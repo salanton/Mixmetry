@@ -24,12 +24,6 @@
   background: var(--accent);
 }
 
-.chip--active {
-  border-color: var(--accent-border);
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-
 .fertilizer-card--empty {
   color: var(--accent-strong);
 }

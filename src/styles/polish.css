@@ -15,7 +15,6 @@ body {
 
 .app-shell { max-width: 1160px; }
 .topbar__title { color: var(--text); font-weight: 820; letter-spacing: -0.035em; }
-.topbar__subtitle { font-size: 0.82rem; font-weight: 650; }
 
 .page-tabs { border-color: var(--border-strong); border-radius: 12px; box-shadow: var(--shadow-card); }
 .page-tabs__button { min-height: 38px; border-radius: 8px; font-size: 0.88rem; font-weight: 760; }
@@ -244,7 +243,6 @@ body {
 .slider__value,
 .summary__time,
 .summary__number,
-.summary__value,
 .schedule-table__volume,
 .schedule-table__number,
 .recipe-result__tile strong,
@@ -297,7 +295,6 @@ body {
 .fertilizer-tools-overlay { background: rgba(19, 35, 31, 0.38); backdrop-filter: blur(8px) saturate(0.85); }
 
 .reminder-button,
-.fertilizer-card__add,
 .fertilizer-line-warning__confirm { border-radius: var(--radius-control); background: var(--accent-strong); color: #fff; box-shadow: none; }
 .reminder-button__text { color: #fff; font-weight: 760; }
 .reminder-button svg { stroke: #fff; }
