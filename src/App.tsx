@@ -56,6 +56,7 @@ type RecipeRow = {
   amountTotal: number
 }
 type PersistentParams = ReturnType<typeof usePersistentParams>
+type PersistentFertilizers = ReturnType<typeof usePersistentFertilizers>
 
 const STAGE_EN: Record<PlantStageId, { title: string; description: string }> = {
   seedling: { title: 'Germination and rooting', description: 'First roots and the first pair of true leaves' },
@@ -642,7 +643,7 @@ function CalculatorPage({ params, updateParam }: PersistentParams) {
   )
 }
 
-function FertilizersPage() {
+function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFertilizers }) {
   const { language } = useAppPreferences()
   const l = (ru: string, en: string) => language === 'ru' ? ru : en
   const [selectedFertilizerId, setSelectedFertilizerId] = useState<string | null>(null)
@@ -656,7 +657,7 @@ function FertilizersPage() {
     fertilizerIds,
     addFromLibrary,
     deleteFertilizer,
-  } = usePersistentFertilizers()
+  } = fertilizerState
 
   const selectedFertilizer = fertilizers.find((item) => item.id === selectedFertilizerId)
   const selectedLibraryPreset = FERTILIZER_LIBRARY.find((item) => item.id === selectedLibraryPresetId)
@@ -1281,7 +1282,11 @@ function FertilizersPage() {
   )
 }
 
-function RecipePage({ params, updateParam }: PersistentParams) {
+function RecipePage({
+  params,
+  updateParam,
+  fertilizers,
+}: PersistentParams & { fertilizers: FertilizerItem[] }) {
   const { language } = useAppPreferences()
   const l = (ru: string, en: string) => language === 'ru' ? ru : en
   const [openRecipePicker, setOpenRecipePicker] = useState<'method' | 'stage' | null>(null)
@@ -1291,8 +1296,6 @@ function RecipePage({ params, updateParam }: PersistentParams) {
     '.recipe-picker',
     () => setOpenRecipePicker(null),
   )
-  const { fertilizers } = usePersistentFertilizers()
-
   const waterVolumeLiters = params.tankVolumeLiters
   const growMethodId = params.recipeGrowMethodId
   const plantStageId = params.recipePlantStageId
@@ -1640,6 +1643,7 @@ function App() {
   const swipeTransitionTimeout = useRef<number | null>(null)
   const isSwipeTransitioning = useRef(false)
   const persistentParams = usePersistentParams()
+  const persistentFertilizers = usePersistentFertilizers()
   const { t } = useAppPreferences()
 
   const isMobileSwipeLayout = () => window.matchMedia(MOBILE_SWIPE_QUERY).matches
@@ -1922,7 +1926,7 @@ function App() {
             inert={activePage !== 'fertilizers'}
             onScroll={(event) => handlePanelScroll('fertilizers', event)}
           >
-            <FertilizersPage />
+            <FertilizersPage fertilizerState={persistentFertilizers} />
           </div>
           <div
             ref={(node) => { swipePanelRefs.current.recipe = node }}
@@ -1931,7 +1935,7 @@ function App() {
             inert={activePage !== 'recipe'}
             onScroll={(event) => handlePanelScroll('recipe', event)}
           >
-            <RecipePage {...persistentParams} />
+            <RecipePage {...persistentParams} fertilizers={persistentFertilizers.fertilizers} />
           </div>
         </div>
       </main>
