@@ -4,16 +4,6 @@
     padding-right: 1rem;
   }
 
-  .page-tabs {
-    flex-basis: auto;
-    width: 100%;
-  }
-
-  .page-tabs__button {
-    padding-inline: 0.4rem;
-    white-space: normal;
-  }
-
   .control-card__header {
     flex-direction: column;
   }

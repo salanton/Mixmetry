@@ -94,10 +94,6 @@
   --section-glow: rgba(117, 106, 172, 0.085);
 }
 
-.mobile-nav-dock {
-  display: none;
-}
-
 .fertilizer-category::before,
 .recipe-result::before {
   background: var(--accent);
@@ -130,7 +126,6 @@
   background: var(--surface-soft);
 }
 
-.page-tabs__button:focus-visible,
 .recipe-choice-button:focus-visible,
 .recipe-picker__option:focus-visible,
 .recipe-picker__close:focus-visible,
@@ -188,33 +183,6 @@
   min-width: 0;
 }
 
-.page-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  flex: 0 1 460px;
-  min-width: 0;
-}
-
-.page-tabs__button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.45rem 0.75rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
-}
-
-.page-tabs__icon,
-.page-tabs__label--mobile {
-  display: none;
-}
-
-.page-tabs__button:focus-visible,
 .recipe-picker__close:focus-visible,
 .fertilizer-tools__close:focus-visible,
 .fertilizer-library__card:focus-visible,
