@@ -807,75 +807,12 @@ body {
 }
 
 /* Fertilizers use the same instrument hierarchy as calculator data. */
-.fertilizer-overview {
-  gap: 0;
-  padding: 0.7rem 1rem;
-  border-color: var(--data-border);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--data-soft) 145%);
-}
-
-.fertilizer-overview::before,
-.fertilizer-category::before {
-  background: var(--data);
-}
-
-.fertilizer-overview__tile,
-.fertilizer-overview__tile--base {
-  min-height: 58px;
-  padding: 0.25rem 1rem;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.fertilizer-overview__tile + .fertilizer-overview__tile {
-  border-left: 1px solid var(--data-border);
-}
 
 .fertilizer-overview__tile > span {
   color: var(--text-muted);
 }
 
-.fertilizer-overview__tile strong,
-.fertilizer-category__count {
-  color: var(--data);
-}
-
-.fertilizer-overview__tile--base strong {
-  color: var(--text);
-}
-
-.fertilizer-category__count {
-  border-color: var(--data-border);
-  background: var(--data-soft);
-}
-
-.fertilizer-manufacturer-group__title {
-  color: var(--text-muted);
-}
-
-.fertilizer-card-grid {
-  gap: 0.55rem;
-}
-
 @media (max-width: 639px) {
-  .fertilizer-overview {
-    gap: 0;
-    padding: 0.65rem 0.75rem;
-  }
-
-  .fertilizer-overview__tile--base {
-    padding-bottom: 0.65rem;
-    border-bottom: 1px solid var(--data-border);
-  }
-
-  .fertilizer-overview__tile + .fertilizer-overview__tile {
-    border-left: 0;
-  }
-
-  .fertilizer-overview__tile:last-child {
-    border-left: 1px solid var(--data-border);
-  }
 }
 
 /* PWA base card: one large tap target; management lives in details. */

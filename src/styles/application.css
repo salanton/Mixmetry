@@ -129,45 +129,8 @@ body {
   display: none;
 }
 
-.page-tabs__button {
-  min-height: 38px;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-weight: 760;
-}
-
-.page-tabs__button--active {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-  box-shadow: inset 0 0 0 1px var(--accent-border);
-}
-
 .page {
   gap: var(--space-3);
-}
-
-.control-card,
-.schedule-card,
-.recipe-result,
-.fertilizer-category {
-  position: relative;
-  border-color: var(--border);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-}
-
-.control-card::before,
-.schedule-card::before,
-.recipe-result::before,
-.fertilizer-category::before {
-  content: "";
-  position: absolute;
-  inset: 0.7rem auto 0.7rem 0;
-  width: 3px;
-  border-radius: 0 999px 999px 0;
-  background: var(--data);
-  opacity: 0.7;
 }
 
 .fertilizer-category::before,
@@ -191,136 +154,16 @@ body {
   color: var(--text-muted);
 }
 
-.slider__value,
-.summary__time,
-.summary__number,
-.summary__value,
-.schedule-table__volume,
-.schedule-table__number,
-.recipe-result__tile strong,
-.stepper__value {
-  color: var(--data);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.025em;
-}
-
-.slider input[type='range'] {
-  accent-color: var(--data);
-}
-
-.toggle-row--switch,
-.recipe-choice-button,
-.fertilizer-card,
-.recipe-picker__option,
-.fertilizer-library__item,
-.fertilizer-library__card {
-  border-color: var(--border);
-  border-radius: 12px;
-  background: var(--surface-muted);
-}
-
-.toggle-row--switch:hover,
-.recipe-choice-button:hover,
-.fertilizer-card:hover,
-.recipe-picker__option:hover,
-.fertilizer-library__item:hover,
-.fertilizer-library__card:hover {
-  border-color: var(--accent-border);
-  background: var(--surface);
-}
-
 .toggle-row__title,
 .fertilizer-card__title,
 .recipe-choice-button__value {
   font-weight: 780;
 }
 
-.fertilizer-card__media {
-  border-radius: 12px;
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-
-.fertilizer-manufacturer-group__title {
-  color: var(--accent-strong);
-  letter-spacing: 0.07em;
-}
-
-.fertilizer-card__chip,
-.fertilizer-category__count {
-  border: 1px solid var(--accent-border);
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-
-.summary {
-  border-color: var(--data-border);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--data-soft) 130%);
-  box-shadow: var(--shadow-card);
-}
-
-.schedule-table {
-  border-color: var(--border);
-  border-radius: 12px;
-}
-
-.schedule-table__head,
-.schedule-table__footer,
-.fertilizer-dosage-table__row--head {
-  background: var(--surface-soft);
-}
-
-.schedule-table__row:nth-child(odd) {
-  background: var(--surface-muted);
-}
-
-.recipe-result__tile {
-  border: 1px solid var(--border);
-  background: var(--surface-muted);
-}
-
-.recipe-result__tile:nth-child(-n + 2) {
-  border-color: var(--data-border);
-  background: var(--data-soft);
-}
-
-.recipe-picker,
-.fertilizer-tools,
-.fertilizer-details-modal,
-.fertilizer-line-warning {
-  border-color: var(--border-strong);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-  box-shadow: var(--shadow-panel);
-}
-
-.recipe-picker-overlay,
-.fertilizer-tools-overlay {
-  background: rgba(19, 35, 31, 0.38);
-  backdrop-filter: blur(8px) saturate(0.85);
-}
-
 .recipe-picker__close,
 .fertilizer-tools__close {
   border: 1px solid var(--border);
   background: var(--surface-soft);
-}
-
-.reminder-button,
-.fertilizer-card__add,
-.fertilizer-line-warning__confirm {
-  border-radius: var(--radius-control);
-  background: var(--accent-strong);
-  color: #fff;
-  box-shadow: none;
-}
-
-.fertilizer-flow-actions__secondary,
-.fertilizer-line-warning__cancel {
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-control);
-  background: var(--surface-soft);
-  color: var(--text);
 }
 
 .page-tabs__button:focus-visible,
@@ -510,12 +353,6 @@ body {
 .text-btn:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--accent-focus);
-}
-
-.page-tabs__button--active {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-  box-shadow: inset 0 0 0 1px var(--accent-border);
 }
 
 .page {
