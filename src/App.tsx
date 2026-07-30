@@ -31,7 +31,7 @@ const SWIPE_THRESHOLD = 48
 const SWIPE_FLICK_THRESHOLD = 28
 const SWIPE_FLICK_DURATION = 300
 const MOBILE_SWIPE_QUERY = '(max-width: 639px)'
-const MOBILE_HEADER_TRAVEL = 12
+const MOBILE_HEADER_TRAVEL = 56
 const SWIPE_BLOCK_SELECTOR = [
   'button',
   'a',
@@ -1653,6 +1653,8 @@ function App() {
     recipe: null,
   })
   const swipeTransitionTimeout = useRef<number | null>(null)
+  const mobileHeaderFrame = useRef<number | null>(null)
+  const pendingHeaderScrollTop = useRef(0)
   const isSwipeTransitioning = useRef(false)
   const persistentParams = usePersistentParams()
   const persistentFertilizers = usePersistentFertilizers()
@@ -1661,12 +1663,20 @@ function App() {
   const isMobileSwipeLayout = () => window.matchMedia(MOBILE_SWIPE_QUERY).matches
 
   const syncMobileHeader = (scrollTop: number) => {
-    const topbar = topbarRef.current
-    if (!topbar) return
-    const travel = Math.min(scrollTop, MOBILE_HEADER_TRAVEL)
-    topbar.style.setProperty('--mobile-header-offset', `${-travel}px`)
-    topbar.style.setProperty('--mobile-header-opacity', `${Math.max(0, 1 - travel / MOBILE_HEADER_TRAVEL)}`)
-    topbar.style.pointerEvents = travel >= MOBILE_HEADER_TRAVEL ? 'none' : ''
+    pendingHeaderScrollTop.current = scrollTop
+    if (mobileHeaderFrame.current !== null) return
+
+    mobileHeaderFrame.current = window.requestAnimationFrame(() => {
+      mobileHeaderFrame.current = null
+      const topbar = topbarRef.current
+      if (!topbar) return
+      const progress = Math.min(pendingHeaderScrollTop.current / MOBILE_HEADER_TRAVEL, 1)
+      const easedProgress = progress * progress * (3 - 2 * progress)
+      const travel = easedProgress * MOBILE_HEADER_TRAVEL
+      topbar.style.setProperty('--mobile-header-offset', `${-travel}px`)
+      topbar.style.setProperty('--mobile-header-opacity', `${1 - easedProgress}`)
+      topbar.style.pointerEvents = progress >= 1 ? 'none' : ''
+    })
     setIsHeaderScrolled(scrollTop > 280)
   }
 
@@ -1748,6 +1758,7 @@ function App() {
 
   useEffect(() => () => {
     if (swipeTransitionTimeout.current !== null) window.clearTimeout(swipeTransitionTimeout.current)
+    if (mobileHeaderFrame.current !== null) window.cancelAnimationFrame(mobileHeaderFrame.current)
   }, [])
 
   const selectPage = (page: PageId) => {

@@ -262,7 +262,7 @@ test('hides the mobile header before it can enter the status area', async ({ pag
 
   const panel = page.locator('.swipe-panel').first()
   const heading = page.locator('.topbar__heading')
-  await panel.evaluate((element) => { element.scrollTop = 40 })
+  await panel.evaluate((element) => { element.scrollTop = 70 })
   await expect(heading).toHaveCSS('opacity', '0')
   await expect(page.locator('.topbar')).toHaveCSS('pointer-events', 'none')
 })
