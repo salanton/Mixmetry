@@ -6,6 +6,7 @@ import BaseLineReplacementDialog, { type BaseLineReplacement } from './component
 import ControlCard from './components/ControlCard'
 import ControlsGrid from './components/ControlsGrid'
 import FertilizerDetailsModal from './components/FertilizerDetailsModal'
+import FertilizerDetailsActions from './components/FertilizerDetailsActions'
 import FertilizerLibraryDialog from './components/FertilizerLibraryDialog'
 import FertilizerShelf from './components/FertilizerShelf'
 import PageNavigation, { type PageId } from './components/PageNavigation'
@@ -276,17 +277,13 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
           onClose={closeLibraryDetails}
           renderDosageLabel={renderDosageLabel}
         />
-            <div className="fertilizer-details-actions fertilizer-details-actions--single">
-              <button
-                className={`fertilizer-details-actions__change ${fertilizerIds.has(selectedLibraryPreset.id) ? 'fertilizer-details-actions__change--added' : ''}`}
-                type="button"
-                aria-pressed={fertilizerIds.has(selectedLibraryPreset.id)}
-                disabled={fertilizerIds.has(selectedLibraryPreset.id)}
-                onClick={() => handleLibraryAdd(selectedLibraryPreset)}
-              >
-                {fertilizerIds.has(selectedLibraryPreset.id) ? l('✓ Добавлено', '✓ Added') : l('Добавить', 'Add')}
-              </button>
-            </div>
+        <FertilizerDetailsActions
+          fertilizer={selectedLibraryPreset}
+          language={language}
+          mode="library"
+          isAdded={fertilizerIds.has(selectedLibraryPreset.id)}
+          onAdd={() => handleLibraryAdd(selectedLibraryPreset)}
+        />
         </>,
         document.body,
       ) : null}
@@ -301,47 +298,19 @@ function FertilizersPage({ fertilizerState }: { fertilizerState: PersistentFerti
           onClose={closeFertilizerDetails}
           renderDosageLabel={renderDosageLabel}
         />
-            <div className={`fertilizer-details-actions${selectedFertilizer.categoryId !== 'base' ? ' fertilizer-details-actions--single' : ''}`}>
-              {selectedFertilizer.categoryId === 'base' ? (
-                <button
-                  className="fertilizer-details-actions__change"
-                  type="button"
-                  onClick={() => {
-                    closeFertilizerDetails()
-                    openAddFlow('base')
-                  }}
-                >
-                  {l('Сменить базу', 'Change base')}
-                </button>
-              ) : null}
-              {!isBaseDeleteConfirmOpen ? (
-                <button
-                  className="fertilizer-details-actions__more"
-                  type="button"
-                  onClick={() => setIsBaseDeleteConfirmOpen(true)}
-                >
-                  {selectedFertilizer.categoryId === 'base' ? l('Удалить', 'Delete') : l('Удалить добавку', 'Delete supplement')}
-                </button>
-              ) : (
-                <div className="fertilizer-details-actions__confirm" role="alert">
-                  <span>
-                    {selectedFertilizer.categoryId === 'base'
-                      ? l('Удалить базу из набора?', 'Remove the base nutrient from the collection?')
-                      : l('Удалить добавку из набора?', 'Remove the supplement from the collection?')}
-                  </span>
-                  <button type="button" onClick={() => setIsBaseDeleteConfirmOpen(false)}>
-                    {l('Отмена', 'Cancel')}
-                  </button>
-                  <button
-                    className="fertilizer-details-actions__delete"
-                    type="button"
-                    onClick={() => handleDelete(selectedFertilizer.id)}
-                  >
-                    {l('Удалить', 'Delete')}
-                  </button>
-                </div>
-              )}
-            </div>
+        <FertilizerDetailsActions
+          fertilizer={selectedFertilizer}
+          language={language}
+          mode="selected"
+          isDeleteConfirmOpen={isBaseDeleteConfirmOpen}
+          onChangeBase={() => {
+            closeFertilizerDetails()
+            openAddFlow('base')
+          }}
+          onRequestDelete={() => setIsBaseDeleteConfirmOpen(true)}
+          onCancelDelete={() => setIsBaseDeleteConfirmOpen(false)}
+          onDelete={() => handleDelete(selectedFertilizer.id)}
+        />
         </>,
         document.body,
       ) : null}
