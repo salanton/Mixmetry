@@ -257,6 +257,54 @@
     padding: 0.8rem;
   }
 
+  /* The watering workspace is used like an instrument panel on a phone:
+     keep the controls comfortably tappable, but show more of the panel at once. */
+  .app-shell--calculator .page {
+    gap: 0.6rem;
+  }
+
+  .app-shell--calculator .controls-grid {
+    gap: 0.6rem;
+  }
+
+  .app-shell--calculator .control-card {
+    padding: 0.7rem 0.8rem;
+  }
+
+  .app-shell--calculator .control-card__body,
+  .app-shell--calculator .control-card--mode .control-card__body,
+  .app-shell--calculator .control-card--waterings .control-card__body {
+    gap: 0.3rem;
+    margin-top: 0.4rem;
+  }
+
+  .app-shell--calculator .control-card--mode .slider,
+  .app-shell--calculator .control-card--waterings .slider {
+    flex: 0 0 auto;
+    min-height: 62px;
+    gap: 0.1rem;
+  }
+
+  .app-shell--calculator .slider__value--standalone {
+    margin-bottom: 0;
+    font-size: 1.08rem;
+  }
+
+  .app-shell--calculator .slider__helper {
+    margin-top: 0.05rem;
+    font-size: 0.74rem;
+  }
+
+  .app-shell--calculator .toggle-row--switch {
+    min-height: 52px;
+    gap: 0.65rem;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .app-shell--calculator .toggle-row__desc {
+    line-height: 1.25;
+  }
+
   .summary__schedule {
     flex-wrap: nowrap;
     overflow-x: auto;
